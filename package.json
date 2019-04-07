@@ -1,0 +1,24 @@
+{
+  "name": "heatseek-electron",
+  "version": "1.0.0",
+  "description": "Heat Seek sensor programmer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cseg-tech/heatseek-electron.git"
+  },
+  "keywords": [
+    "Heat",
+    "Seek",
+    "Sensor"
+  ],
+  "author": "CSEG Tech",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/cseg-tech/heatseek-electron/issues"
+  },
+  "homepage": "https://github.com/cseg-tech/heatseek-electron#readme"
+}
