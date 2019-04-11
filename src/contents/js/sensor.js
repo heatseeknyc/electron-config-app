@@ -1,6 +1,12 @@
 'use strict';
-var React = require("react");
-var ReactDOM = require("react-dom");
+const React = require("react");
+const ReactDOM = require("react-dom");
+const SerialPort = require("serialport");
+
+SerialPort.list().then(
+	ports => ports.forEach(console.log),
+	err => console.error(err)
+)
 
 class NavBar extends React.Component {
 	render() {

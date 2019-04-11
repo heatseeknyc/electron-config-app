@@ -22,6 +22,14 @@ var React = require("react");
 
 var ReactDOM = require("react-dom");
 
+var SerialPort = require("serialport");
+
+SerialPort.list().then(function (ports) {
+  return ports.forEach(console.log);
+}, function (err) {
+  return console.error(err);
+});
+
 var NavBar =
 /*#__PURE__*/
 function (_React$Component) {

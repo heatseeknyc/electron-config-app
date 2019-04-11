@@ -27,6 +27,7 @@
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-react": "^7.0.0",
     "electron": "^4.1.4",
+    "electron-rebuild": "^1.8.4",
     "gulp": "^4.0.0",
     "gulp-babel": "^8.0.0",
     "gulp-concat": "^2.6.1",
@@ -38,6 +39,7 @@
     "jquery": "^3.4.0",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "serialport": "^7.1.4"
   }
 }

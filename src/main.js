@@ -1,5 +1,8 @@
 // example from https://fearby.com/article/create-first-hello-world-electron-app-osx/
 const electron = require('electron');
+const React = require("react");
+const ReactDOM = require("react-dom");
+const SerialPort = require("serialport");
 const app = electron.app;
 
 const path = require('path');

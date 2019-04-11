@@ -3,6 +3,12 @@
 // example from https://fearby.com/article/create-first-hello-world-electron-app-osx/
 var electron = require('electron');
 
+var React = require("react");
+
+var ReactDOM = require("react-dom");
+
+var SerialPort = require("serialport");
+
 var app = electron.app;
 
 var path = require('path');
