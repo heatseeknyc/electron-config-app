@@ -2,10 +2,10 @@
   "name": "heatseek-electron",
   "version": "1.0.0",
   "description": "Heat Seek sensor programmer",
-  "main": "app.js",
+  "main": "app/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "gulp start"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,21 @@
   },
   "homepage": "https://github.com/cseg-tech/heatseek-electron#readme",
   "devDependencies": {
-    "electron": "^4.1.4"
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-react": "^7.0.0",
+    "electron": "^4.1.4",
+    "gulp": "^4.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-css": "^0.1.0",
+    "gulp-sourcemaps": "^2.6.5"
+  },
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "jquery": "^3.4.0",
+    "popper.js": "^1.15.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   }
 }

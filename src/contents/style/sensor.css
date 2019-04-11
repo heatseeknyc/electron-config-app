@@ -15,7 +15,7 @@ p {
 /* Console Sidebar - slides out */
 .sideConsole {
 	height: 100%;
-	width: 0;			/* Dynamic */
+/*	width: 0;*/
 	position: fixed;
 	z-index: 1;
 	top: 0;
@@ -28,8 +28,8 @@ p {
 	font-size: 12px;
 }
 
-#consoleClose {
-	position: absolute;
+#consoleIcon {
+	position: relative;
 	top: 21px;
 	left: 21px;
 	color: #fff !important;

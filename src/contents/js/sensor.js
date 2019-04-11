@@ -2,50 +2,44 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-function openConsole() {
-	document.getElementById('sideConsoleID').style.width = "33%";
-}
-
-function closeConsole() {
-	document.getElementById('sideConsoleID').style.width = "0%";
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-	document.getElementById('consoleIcon').addEventListener('click', openConsole);
-	document.getElementById('consoleClose').addEventListener('click', closeConsole);
-});
-
 class NavBar extends React.Component {
 	render() {
 		return (
-			<nav class="navbar navbar-light bg-light">
-				<a class="navbar-brand" href="https://heatseek.org/">
-					<img src="contents/img/heat_seek-logo-@2x-tp.png" height="45" class="d-inline-block align-top" />
+			<nav className="navbar navbar-light bg-light">
+				<a className="navbar-brand" href="https://heatseek.org/">
+					<img src="contents/img/heat_seek-logo-@2x-tp.png" height="45" className="d-inline-block align-top" />
 				</a>
-				<ul class="nav justify-content-end">
-					<li class="nav-item">
-			  			<a href="#"><i class="fas fa-terminal fa-lg" id="consoleIcon"></i></a>
-					</li>
-				</ul>
 			</nav>
 		);
 	}
 };
 
 class SideConsole extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {width: "0%"};
+		this.toggleExpand = this.toggleExpand.bind(this);
+	}
+	toggleExpand() {
+		if (this.state.width == "0%"){
+			this.setState({width: "30%"});
+		}else{
+			this.setState({width: "0%"});
+		}
+	}
 	render() {
 		return (
-			<div id="sideConsoleID" class="sideConsole">
-				<div class="consoleHeader">
+			<div id="sideConsoleID" className="sideConsole" style={{width:this.state.width}}>
+				<div className="consoleHeader">
+					<a href="#" onClick={this.toggleExpand}><i className="fas fa-terminal fa-2x" id="consoleIcon"></i></a>
 				</div>
-				<a href="#"><i class="fas fa-times fa-2x" id="consoleClose"></i></a>
-				<div class="consoleOutput">
+				<div className="consoleOutput">
 					Filler
 				</div>
-				<div class="consoleForm">
-					<form class="form-inline">
-						<input type="text" class="form-control " id="consoleInput" placeholder="For developers only!" />
-						<button type="submit" class="btn btn-secondary">></button>
+				<div className="consoleForm">
+					<form className="form-inline">
+						<input type="text" className="form-control " id="consoleInput" placeholder="For developers only!" />
+						<button type="submit" className="btn btn-secondary">></button>
 					</form>
 				</div>
 			</div>

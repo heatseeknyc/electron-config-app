@@ -22,19 +22,6 @@ var React = require("react");
 
 var ReactDOM = require("react-dom");
 
-function openConsole() {
-  document.getElementById('sideConsoleID').style.width = "33%";
-}
-
-function closeConsole() {
-  document.getElementById('sideConsoleID').style.width = "0%";
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById('consoleIcon').addEventListener('click', openConsole);
-  document.getElementById('consoleClose').addEventListener('click', closeConsole);
-});
-
 var NavBar =
 /*#__PURE__*/
 function (_React$Component) {
@@ -50,24 +37,15 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       return React.createElement("nav", {
-        "class": "navbar navbar-light bg-light"
+        className: "navbar navbar-light bg-light"
       }, React.createElement("a", {
-        "class": "navbar-brand",
+        className: "navbar-brand",
         href: "https://heatseek.org/"
       }, React.createElement("img", {
         src: "contents/img/heat_seek-logo-@2x-tp.png",
         height: "45",
-        "class": "d-inline-block align-top"
-      })), React.createElement("ul", {
-        "class": "nav justify-content-end"
-      }, React.createElement("li", {
-        "class": "nav-item"
-      }, React.createElement("a", {
-        href: "#"
-      }, React.createElement("i", {
-        "class": "fas fa-terminal fa-lg",
-        id: "consoleIcon"
-      })))));
+        className: "d-inline-block align-top"
+      })));
     }
   }]);
 
@@ -81,39 +59,63 @@ var SideConsole =
 function (_React$Component2) {
   _inherits(SideConsole, _React$Component2);
 
-  function SideConsole() {
+  function SideConsole(props) {
+    var _this;
+
     _classCallCheck(this, SideConsole);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SideConsole).apply(this, arguments));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SideConsole).call(this, props));
+    _this.state = {
+      width: "0%"
+    };
+    _this.toggleExpand = _this.toggleExpand.bind(_assertThisInitialized(_this));
+    return _this;
   }
 
   _createClass(SideConsole, [{
+    key: "toggleExpand",
+    value: function toggleExpand() {
+      if (this.state.width == "0%") {
+        this.setState({
+          width: "30%"
+        });
+      } else {
+        this.setState({
+          width: "0%"
+        });
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
         id: "sideConsoleID",
-        "class": "sideConsole"
+        className: "sideConsole",
+        style: {
+          width: this.state.width
+        }
       }, React.createElement("div", {
-        "class": "consoleHeader"
-      }), React.createElement("a", {
-        href: "#"
+        className: "consoleHeader"
+      }, React.createElement("a", {
+        href: "#",
+        onClick: this.toggleExpand
       }, React.createElement("i", {
-        "class": "fas fa-times fa-2x",
-        id: "consoleClose"
-      })), React.createElement("div", {
-        "class": "consoleOutput"
+        className: "fas fa-terminal fa-2x",
+        id: "consoleIcon"
+      }))), React.createElement("div", {
+        className: "consoleOutput"
       }, "Filler"), React.createElement("div", {
-        "class": "consoleForm"
+        className: "consoleForm"
       }, React.createElement("form", {
-        "class": "form-inline"
+        className: "form-inline"
       }, React.createElement("input", {
         type: "text",
-        "class": "form-control ",
+        className: "form-control ",
         id: "consoleInput",
         placeholder: "For developers only!"
       }), React.createElement("button", {
         type: "submit",
-        "class": "btn btn-secondary"
+        className: "btn btn-secondary"
       }, ">"))));
     }
   }]);
