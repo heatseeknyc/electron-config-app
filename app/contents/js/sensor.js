@@ -215,6 +215,11 @@ function (_React$Component4) {
 
     _this3 = _possibleConstructorReturn(this, _getPrototypeOf(Tester).call(this, props));
     _this3.handleTest = _this3.handleTest.bind(_assertThisInitialized(_this3));
+    _this3.enableButton = _this3.enableButton.bind(_assertThisInitialized(_this3));
+    _this3.state = {
+      enabled: false,
+      delay: 5
+    };
     return _this3;
   }
 
@@ -225,16 +230,44 @@ function (_React$Component4) {
       this.props.testConnection(); //TODO/
     }
   }, {
+    key: "enableButton",
+    value: function enableButton() {
+      var _this4 = this;
+
+      if (this.state['delay'] > 0) {
+        setTimeout(function () {
+          _this4.setState({
+            delay: _this4.state['delay'] - 1
+          });
+        }, 1000);
+      } else {
+        this.setState({
+          enabled: true
+        });
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
+      var button; // Delay is decremented either in 5 seconds, or if incoming message appears
+
+      if (!this.state['enabled']) {
+        this.enableButton();
+        var button = React.createElement("button", {
+          className: "btn disabled"
+        }, "Wait ", this.state['delay'], "...");
+      } else {
+        var button = React.createElement("button", {
+          className: "btn btn-primary",
+          onClick: this.handleTest
+        }, "Continue");
+      }
+
       return React.createElement("div", {
         className: "instructions"
       }, React.createElement("form", null, React.createElement("label", {
         htmlFor: "plugCheck"
-      }, "We will now test your connection with the sensor."), React.createElement("button", {
-        className: "btn btn-primary",
-        onClick: this.handleTest
-      }, "Continue")));
+      }, "We will now test your connection with the sensor."), React.createElement("br", null), button));
     }
   }]);
 
@@ -247,39 +280,39 @@ function (_React$Component5) {
   _inherits(App, _React$Component5);
 
   function App(props) {
-    var _this4;
+    var _this5;
 
     _classCallCheck(this, App);
 
-    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this4.connectPort = _this4.connectPort.bind(_assertThisInitialized(_this4));
-    _this4.findAndConnect = _this4.findAndConnect.bind(_assertThisInitialized(_this4));
-    _this4.writePort = _this4.writePort.bind(_assertThisInitialized(_this4));
-    _this4.testConnection = _this4.testConnection.bind(_assertThisInitialized(_this4));
-    _this4.state = {
+    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
+    _this5.connectPort = _this5.connectPort.bind(_assertThisInitialized(_this5));
+    _this5.findAndConnect = _this5.findAndConnect.bind(_assertThisInitialized(_this5));
+    _this5.writePort = _this5.writePort.bind(_assertThisInitialized(_this5));
+    _this5.testConnection = _this5.testConnection.bind(_assertThisInitialized(_this5));
+    _this5.state = {
       deviceConnect: false,
       portName: "",
       port: null,
       step: 0.0,
       buffer: ""
     };
-    return _this4;
+    return _this5;
   }
 
   _createClass(App, [{
     key: "connectPort",
     value: function connectPort(foundPortName) {
-      var _this5 = this;
+      var _this6 = this;
 
       var openPort = new SerialPort(foundPortName, {
         baudRate: 9600
       });
       openPort.on('data', function (chunk) {
         var chunkStr = String.fromCharCode.apply(String, _toConsumableArray(chunk));
-        var before = _this5.state['buffer'];
+        var before = _this6.state['buffer'];
         before += chunkStr;
 
-        _this5.setState({
+        _this6.setState({
           buffer: before
         });
       });
@@ -292,30 +325,32 @@ function (_React$Component5) {
   }, {
     key: "findAndConnect",
     value: function findAndConnect() {
-      var _this6 = this;
+      var _this7 = this;
 
       var pr = new Promise(function (resolve, reject) {
         SerialPort.list().then(function (ports) {
+          var portFlag;
           ports.forEach(function (port) {
             var pm = port['manufacturer'];
 
             if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
-              _this6.connectPort(port.comName.toString());
+              _this7.connectPort(port.comName.toString());
 
               resolve();
             }
-          });
+          }); // this is fine, forEach is blocking.
+
           reject("No sensor port found");
         }, function (err) {
           return console.err(err);
         });
       });
       pr.then(function (resolve) {
-        _this6.setState({
+        _this7.setState({
           step: 1.0
         });
       }, function (err) {
-        _this6.setState({
+        _this7.setState({
           step: 1.1
         });
       });
@@ -323,28 +358,37 @@ function (_React$Component5) {
   }, {
     key: "writePort",
     value: function writePort(msg) {
-      var before = this.state['buffer'];
-      before += "> " + msg + "\n";
-      this.setState({
-        buffer: before
+      var _this8 = this;
+
+      return new Promise(function (resolve, reject) {
+        var before = _this8.state['buffer'];
+        before += "> " + msg + "\n";
+
+        _this8.setState({
+          buffer: before
+        });
+
+        if (_this8.state['deviceConnect'] == true) {
+          console.log("writing " + msg); // Arduino code expects newline at the end of msg.
+
+          _this8.state['port'].write(msg + '\n');
+
+          resolve();
+        } else {
+          reject("No device connected");
+        }
       });
-
-      if (this.state['deviceConnect'] == true) {
-        console.log("writing " + msg); // Arduino code expects newline at the end of msg.
-
-        this.state['port'].write(msg + '\n');
-      }
     }
   }, {
     key: "testConnection",
     value: function testConnection() {
-      var _this7 = this;
+      var _this9 = this;
 
       // Test if we can currently enter the menu
       var pr = new Promise(function (resolve, reject) {
         var i = 0;
 
-        var msgList = _this7.state['buffer'].split('\n');
+        var msgList = _this9.state['buffer'].split('\n');
 
         var bufLength = msgList.length;
         console.log(bufLength);
@@ -355,16 +399,24 @@ function (_React$Component5) {
           }
 
           i++;
-        }
+        } // while is blocking, this is fine
+
 
         reject("No menu prompt found");
       });
       pr.then(function (resolve) {
-        _this7.setState({
+        // Enter menu and enter wifi setup
+        _this9.writePort("C").then(function (resolve) {
+          setTimeout(function () {
+            _this9.writePort("w");
+          }, 2000);
+        });
+
+        _this9.setState({
           step: 2.0
         });
       }, function (err) {
-        _this7.setState({
+        _this9.setState({
           step: 2.1
         });
       });
@@ -391,15 +443,15 @@ function (_React$Component5) {
 
         case 1.1:
           // Device not found
-          instructions = React.createElement("h1", null, " not found ");
+          instructions = React.createElement("h1", null, " Device not found. Reconnect and ctrl-R or cmd-R ");
           break;
 
         case 2.0:
-          instructions = React.createElement("h1", null, " Test Success ");
+          instructions = React.createElement("h1", null, "  ");
           break;
 
         case 2.1:
-          instructions = React.createElement("h1", null, " Test Failure ");
+          instructions = React.createElement("h1", null, " Sensor needs to be reset. ");
           break;
 
         default:

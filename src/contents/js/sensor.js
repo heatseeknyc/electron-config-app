@@ -94,22 +94,42 @@ class Tester extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleTest = this.handleTest.bind(this);
+		this.enableButton = this.enableButton.bind(this);
+		this.state = {enabled:false, delay:5}
 	}
 	handleTest(e) {
 		e.preventDefault();
 		this.props.testConnection(); //TODO/
 	}
+	enableButton() {
+		if(this.state['delay'] > 0){
+			setTimeout(() => {
+				this.setState({delay: this.state['delay'] - 1});
+			}, 1000);
+		}else{
+			this.setState({enabled:true})
+		}
+	}
 	render() {
+		var button;
+		// Delay is decremented either in 5 seconds, or if incoming message appears
+		if(!this.state['enabled']){
+			this.enableButton();
+			var button = <button className="btn disabled">Wait {this.state['delay']}...</button>;
+		}else{
+			var button = <button className="btn btn-primary" onClick={this.handleTest}>Continue</button>;
+		}
 		return(
 			<div className="instructions">
 			<form>
 				<label htmlFor="plugCheck">
 				We will now test your connection with the sensor.
 				</label>
-				<button className="btn btn-primary" onClick={this.handleTest}>Continue</button>
+				<br />
+				{button}
 			</form>
 			</div>
-		)
+		);
 	}
 }
 
@@ -150,6 +170,7 @@ class App extends React.Component {
 		var pr = new Promise((resolve, reject) => {
 			SerialPort.list().then(
 				ports => {
+					var portFlag
 					ports.forEach(port => {
 						var pm = port['manufacturer'];
 						if(typeof pm !== 'undefined' && pm.includes('Adafruit')){
@@ -157,6 +178,7 @@ class App extends React.Component {
 							resolve();
 						}
 					});
+					// this is fine, forEach is blocking.
 					reject("No sensor port found");
 				},
 				err => console.err(err)
@@ -174,14 +196,19 @@ class App extends React.Component {
 
 	}
 	writePort(msg) {
-		var before = this.state['buffer'];
-		before += ("> " + msg + "\n");
-		this.setState({buffer:before});
-		if(this.state['deviceConnect'] == true) {
-			console.log("writing " + msg);
-			// Arduino code expects newline at the end of msg.
-			this.state['port'].write(msg+'\n');
-		}
+		return new Promise((resolve, reject) => {
+			var before = this.state['buffer'];
+			before += ("> " + msg + "\n");
+			this.setState({buffer:before});
+			if(this.state['deviceConnect'] == true) {
+				console.log("writing " + msg);
+				// Arduino code expects newline at the end of msg.
+				this.state['port'].write(msg+'\n');
+				resolve();
+			}else{
+				reject("No device connected");
+			}
+		});
 	}
 	testConnection() {
 		// Test if we can currently enter the menu
@@ -196,11 +223,18 @@ class App extends React.Component {
 				}
 				i++;
 			}
+			// while is blocking, this is fine
 			reject("No menu prompt found");
 		});
 
 		pr.then(
 			resolve => {
+				// Enter menu and enter wifi setup
+				this.writePort("C").then(
+					resolve => { setTimeout(() => {
+						this.writePort("w");
+					}, 2000)}
+				);
 				this.setState({ step:2.0 });
 			},
 			err => {
@@ -221,13 +255,13 @@ class App extends React.Component {
 				break;
 			case 1.1:
 				// Device not found
-				instructions = <h1> not found </h1>;
+				instructions = <h1> Device not found. Reconnect and ctrl-R or cmd-R </h1>;
 				break;
 			case 2.0:
-				instructions = <h1> Test Success </h1>;
+				instructions = <h1>  </h1>;
 				break;
 			case 2.1:
-				instructions = <h1> Test Failure </h1>;
+				instructions = <h1> Sensor needs to be reset. </h1>;
 				break;
 			default:
 				instructions = <h1> Unexpected step {this.state['step']} </h1>;
