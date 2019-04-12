@@ -53,6 +53,29 @@ class SideConsole extends React.Component {
 	}
 }
 
+class Starter extends React.Component {
+	constructor(props) {
+		super(props);
+		this.handleConnect = this.handleConnect.bind(this);
+	}
+	handleConnect(e) {
+		// Prevent form submission
+		e.preventDefault();
+		// Tell parent to connect
+		this.props.findAndConnect()
+	}
+	render() {
+		return(
+			<form>
+				<label htmlFor="plugCheck">
+				You should've received a Heat Seek Temperature Sensor and a USB cable. Plug in the end of the cable that looks like a phone charger to the side of the sensor. Plug in the other end to your computer. Open the top of the plastic case and press the small reset button on the top.
+				</label>
+				<button className="btn btn-primary" onClick={this.handleConnect}>I did it!</button>
+			</form>
+		)
+	}
+}
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
@@ -61,7 +84,8 @@ class App extends React.Component {
 		this.state = {
 			deviceConnect: false,
 			portName: "",
-			port: null
+			port: null,
+			step: 0
 		};
 	}
 	connectPort(foundPortName) {
@@ -79,27 +103,29 @@ class App extends React.Component {
 		});
 	}
 	findAndConnect() {
-		SerialPort.list().then(
-			ports => {
-				ports.forEach(port => {
-					var pm = port['manufacturer'];
-					if(typeof pm !== 'undefined' && pm.includes('Adafruit')){
-						console.log("Found sensor serialport.");
-						this.connectPort(port.comName.toString());
-					}
-				});
-			},
-			err => console.err(err)
-		)
+		var pr = new Promise((resolve, reject) => {
+			SerialPort.list().then(
+				ports => {
+					ports.forEach(port => {
+						var pm = port['manufacturer'];
+						if(typeof pm !== 'undefined' && pm.includes('Adafruit')){
+							this.connectPort(port.comName.toString());
+							resolve();
+						}
+					});
+					reject("No sensor port found");
+				},
+				err => console.err(err)
+			)
+		});
+
 	}
 	render() {
-		if(!this.state.deviceConnect){
-			this.findAndConnect();
-		}
 		return(
 			<div>
 				<NavBar />
 				<SideConsole />
+				<Starter findAndConnect={this.findAndConnect} />
 			</div>
 		);
 	}

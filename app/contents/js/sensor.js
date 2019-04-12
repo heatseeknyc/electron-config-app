@@ -139,25 +139,63 @@ function (_React$Component2) {
   return SideConsole;
 }(React.Component);
 
-var App =
+var Starter =
 /*#__PURE__*/
 function (_React$Component3) {
-  _inherits(App, _React$Component3);
+  _inherits(Starter, _React$Component3);
+
+  function Starter(props) {
+    var _this2;
+
+    _classCallCheck(this, Starter);
+
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(Starter).call(this, props));
+    _this2.handleConnect = _this2.handleConnect.bind(_assertThisInitialized(_this2));
+    return _this2;
+  }
+
+  _createClass(Starter, [{
+    key: "handleConnect",
+    value: function handleConnect(e) {
+      // Prevent form submission
+      e.preventDefault(); // Tell parent to connect
+
+      this.props.findAndConnect();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return React.createElement("form", null, React.createElement("label", {
+        htmlFor: "plugCheck"
+      }, "You should've received a Heat Seek Temperature Sensor and a USB cable. Plug in the end of the cable that looks like a phone charger to the side of the sensor. Plug in the other end to your computer. Open the top of the plastic case and press the small reset button on the top."), React.createElement("button", {
+        className: "btn btn-primary",
+        onClick: this.handleConnect
+      }, "I did it!"));
+    }
+  }]);
+
+  return Starter;
+}(React.Component);
+
+var App =
+/*#__PURE__*/
+function (_React$Component4) {
+  _inherits(App, _React$Component4);
 
   function App(props) {
-    var _this2;
+    var _this3;
 
     _classCallCheck(this, App);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this2.findAndConnect = _this2.findAndConnect.bind(_assertThisInitialized(_this2));
-    _this2.connectPort = _this2.connectPort.bind(_assertThisInitialized(_this2));
-    _this2.state = {
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
+    _this3.findAndConnect = _this3.findAndConnect.bind(_assertThisInitialized(_this3));
+    _this3.connectPort = _this3.connectPort.bind(_assertThisInitialized(_this3));
+    _this3.state = {
       deviceConnect: false,
       portName: "",
       port: null
     };
-    return _this2;
+    return _this3;
   }
 
   _createClass(App, [{
@@ -179,30 +217,31 @@ function (_React$Component3) {
   }, {
     key: "findAndConnect",
     value: function findAndConnect() {
-      var _this3 = this;
+      var _this4 = this;
 
-      SerialPort.list().then(function (ports) {
-        ports.forEach(function (port) {
-          var pm = port['manufacturer'];
+      var pr = new Promise(function (resolve, reject) {
+        SerialPort.list().then(function (ports) {
+          ports.forEach(function (port) {
+            var pm = port['manufacturer'];
 
-          if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
-            console.log("Found sensor serialport.");
+            if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
+              _this4.connectPort(port.comName.toString());
 
-            _this3.connectPort(port.comName.toString());
-          }
+              resolve();
+            }
+          });
+          reject("No sensor port found");
+        }, function (err) {
+          return console.err(err);
         });
-      }, function (err) {
-        return console.err(err);
       });
     }
   }, {
     key: "render",
     value: function render() {
-      if (!this.state.deviceConnect) {
-        this.findAndConnect();
-      }
-
-      return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, null));
+      return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, null), React.createElement(Starter, {
+        findAndConnect: this.findAndConnect
+      }));
     }
   }]);
 
