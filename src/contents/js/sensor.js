@@ -323,9 +323,9 @@ class App extends React.Component {
 			return delay(2000);
 		}).then( resolve => {
 			if(wifiState['selectedOption'] == 'live'){
-				return this.writePort('3700');
-			}else if(wifiState['selectedOption'] == 'test'){
 				return this.writePort('3600');
+			}else if(wifiState['selectedOption'] == 'test'){
+				return this.writePort('3700');
 			}
 		});
 	}
