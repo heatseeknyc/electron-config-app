@@ -30,7 +30,7 @@ class SideConsole extends React.Component {
 	}
 	toggleExpand() {
 		if (this.state.width == "0%"){
-			this.setState({width: "30%"});
+			this.setState({width: "40%"});
 		}else{
 			this.setState({width: "0%"});
 		}
@@ -158,6 +158,7 @@ class SetupWifi extends React.Component {
 	}
 	render() {
 		return (
+			<div className="instructions">
 			<form>
 				<div className="form-group">
 					<label htmlFor="wifiSSID">
@@ -192,6 +193,7 @@ class SetupWifi extends React.Component {
 				</div>
 				<button type="submit" className="btn btn-primary" onClick={this.handleClick}>Connect!</button>
 			</form>
+			</div>
 		);
 	}
 }
@@ -203,6 +205,7 @@ class App extends React.Component {
 		this.findAndConnect = this.findAndConnect.bind(this);
 		this.writePort = this.writePort.bind(this);
 		this.testConnection = this.testConnection.bind(this);
+		this.setupWifi = this.setupWifi.bind(this);
 
 		this.state = {
 			deviceConnect: false,
@@ -273,6 +276,7 @@ class App extends React.Component {
 		});
 	}
 	testConnection() {
+		const delay = t => new Promise(resolve => setTimeout(resolve, t));
 		// Test if we can currently enter the menu
 		var pr = new Promise((resolve, reject) => {
 			var i = 0;
@@ -292,11 +296,11 @@ class App extends React.Component {
 		pr.then(
 			resolve => {
 				// Enter menu and enter wifi setup
-				this.writePort("C").then(
-					resolve => { setTimeout(() => {
-						this.writePort("w");
-					}, 2000)}
-				);
+				this.writePort("C").then( resolve => {
+					return delay(2000);
+				}).then( resolve => {
+					 this.writePort("w");
+				});
 				this.setState({ step:2.0 });
 			},
 			err => {
@@ -306,6 +310,24 @@ class App extends React.Component {
 	}
 	setupWifi(wifiState) {
 		console.log(wifiState);
+		const delay = t => new Promise(resolve => setTimeout(resolve, t));
+		this.writePort(wifiState['ssid']).then( resolve => {
+			return delay(2000);
+		}).then( resolve => {
+			return this.writePort(wifiState['pwd']);
+		}).then( resolve => {
+			return delay(2000);
+		}).then( resolve => {
+			return this.writePort('r');
+		}).then( resolve => {
+			return delay(2000);
+		}).then( resolve => {
+			if(wifiState['selectedOption'] == 'live'){
+				return this.writePort('3700');
+			}else if(wifiState['selectedOption'] == 'test'){
+				return this.writePort('3600');
+			}
+		});
 	}
 	render() {
 		var instructions

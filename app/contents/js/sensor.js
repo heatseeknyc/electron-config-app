@@ -96,7 +96,7 @@ function (_React$Component2) {
     value: function toggleExpand() {
       if (this.state.width == "0%") {
         this.setState({
-          width: "30%"
+          width: "40%"
         });
       } else {
         this.setState({
@@ -327,7 +327,9 @@ function (_React$Component5) {
   }, {
     key: "render",
     value: function render() {
-      return React.createElement("form", null, React.createElement("div", {
+      return React.createElement("div", {
+        className: "instructions"
+      }, React.createElement("form", null, React.createElement("div", {
         className: "form-group"
       }, React.createElement("label", {
         htmlFor: "wifiSSID"
@@ -381,7 +383,7 @@ function (_React$Component5) {
         type: "submit",
         className: "btn btn-primary",
         onClick: this.handleClick
-      }, "Connect!"));
+      }, "Connect!")));
     }
   }]);
 
@@ -403,6 +405,7 @@ function (_React$Component6) {
     _this6.findAndConnect = _this6.findAndConnect.bind(_assertThisInitialized(_this6));
     _this6.writePort = _this6.writePort.bind(_assertThisInitialized(_this6));
     _this6.testConnection = _this6.testConnection.bind(_assertThisInitialized(_this6));
+    _this6.setupWifi = _this6.setupWifi.bind(_assertThisInitialized(_this6));
     _this6.state = {
       deviceConnect: false,
       portName: "",
@@ -498,7 +501,13 @@ function (_React$Component6) {
     value: function testConnection() {
       var _this10 = this;
 
-      // Test if we can currently enter the menu
+      var delay = function delay(t) {
+        return new Promise(function (resolve) {
+          return setTimeout(resolve, t);
+        });
+      }; // Test if we can currently enter the menu
+
+
       var pr = new Promise(function (resolve, reject) {
         var i = 0;
 
@@ -521,9 +530,9 @@ function (_React$Component6) {
       pr.then(function (resolve) {
         // Enter menu and enter wifi setup
         _this10.writePort("C").then(function (resolve) {
-          setTimeout(function () {
-            _this10.writePort("w");
-          }, 2000);
+          return delay(2000);
+        }).then(function (resolve) {
+          _this10.writePort("w");
         });
 
         _this10.setState({
@@ -538,7 +547,33 @@ function (_React$Component6) {
   }, {
     key: "setupWifi",
     value: function setupWifi(wifiState) {
+      var _this11 = this;
+
       console.log(wifiState);
+
+      var delay = function delay(t) {
+        return new Promise(function (resolve) {
+          return setTimeout(resolve, t);
+        });
+      };
+
+      this.writePort(wifiState['ssid']).then(function (resolve) {
+        return delay(2000);
+      }).then(function (resolve) {
+        return _this11.writePort(wifiState['pwd']);
+      }).then(function (resolve) {
+        return delay(2000);
+      }).then(function (resolve) {
+        return _this11.writePort('r');
+      }).then(function (resolve) {
+        return delay(2000);
+      }).then(function (resolve) {
+        if (wifiState['selectedOption'] == 'live') {
+          return _this11.writePort('3700');
+        } else if (wifiState['selectedOption'] == 'test') {
+          return _this11.writePort('3600');
+        }
+      });
     }
   }, {
     key: "render",
@@ -566,6 +601,7 @@ function (_React$Component6) {
           break;
 
         case 2.0:
+          // Setup Wifi
           instructions = React.createElement(SetupWifi, {
             setupWifi: this.setupWifi
           });
