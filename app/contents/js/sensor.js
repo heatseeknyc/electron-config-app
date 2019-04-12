@@ -326,7 +326,9 @@ function (_React$Component5) {
       });
 
       if (this.state['deviceConnect'] == true) {
-        this.state["port"].write(msg);
+        console.log("writing " + msg); // Arduino code expects newline at the end of msg.
+
+        this.state['port'].write(msg + '\n');
       }
     }
   }, {

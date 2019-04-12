@@ -177,7 +177,9 @@ class App extends React.Component {
 		before += ("> " + msg + "\n");
 		this.setState({buffer:before});
 		if(this.state['deviceConnect'] == true) {
-			this.state["port"].write(msg);
+			console.log("writing " + msg);
+			// Arduino code expects newline at the end of msg.
+			this.state['port'].write(msg+'\n');
 		}
 	}
 	testConnection() {
