@@ -23,8 +23,8 @@ class NavBar extends React.Component {
 class SideConsole extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {width: "0%"};
 		this.toggleExpand = this.toggleExpand.bind(this);
+		this.state = {width: "0%"};
 	}
 	toggleExpand() {
 		if (this.state.width == "0%"){
@@ -40,7 +40,9 @@ class SideConsole extends React.Component {
 					<a href="#" onClick={this.toggleExpand}><i className="fas fa-terminal fa-2x" id="consoleIcon"></i></a>
 				</div>
 				<div className="consoleOutput">
-					Filler
+					{this.props['buffer'].split('\n').map((serialIn) => {
+						return ( <React.Fragment> {serialIn} <br /> </React.Fragment>);
+					})}
 				</div>
 				<div className="consoleForm">
 					<form className="form-inline">
@@ -49,7 +51,7 @@ class SideConsole extends React.Component {
 					</form>
 				</div>
 			</div>
-		)
+		);
 	}
 }
 
@@ -85,7 +87,8 @@ class App extends React.Component {
 			deviceConnect: false,
 			portName: "",
 			port: null,
-			step: 0
+			step: 0.0,
+			buffer: ""
 		};
 	}
 	connectPort(foundPortName) {
@@ -93,8 +96,10 @@ class App extends React.Component {
 			baudRate: 9600
 		});
 		openPort.on('data', chunk => {
-			var str = String.fromCharCode(...chunk);
-			console.log(str);
+			var chunkStr = String.fromCharCode(...chunk);
+			var before = this.state['buffer'];
+			before += chunkStr;
+			this.setState({buffer:before});
 		});
 		this.setState({
 			deviceConnect: true,
@@ -119,13 +124,35 @@ class App extends React.Component {
 			)
 		});
 
+		pr.then(
+			resolve => {
+				this.setState({ step:1.0 });
+			},
+			err => {
+				this.setState({ step:1.1 });
+			}
+		)
+
 	}
 	render() {
+		var instructions
+		if(this.state['step'] == 0.0) {
+			// Starting Instructions
+			instructions = <Starter findAndConnect={this.findAndConnect} />
+		}
+		if(this.state['step'] == 1.0) {
+			// Device Found
+			instructions = <h1> found </h1>
+		}
+		if(this.state['step'] == 1.1) {
+			// Device not found
+			instructions = <h1> not found </h1>
+		}
 		return(
 			<div>
 				<NavBar />
-				<SideConsole />
-				<Starter findAndConnect={this.findAndConnect} />
+				<SideConsole buffer={this.state['buffer']}/>
+				{instructions}
 			</div>
 		);
 	}

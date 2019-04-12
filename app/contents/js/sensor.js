@@ -81,10 +81,10 @@ function (_React$Component2) {
     _classCallCheck(this, SideConsole);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SideConsole).call(this, props));
+    _this.toggleExpand = _this.toggleExpand.bind(_assertThisInitialized(_this));
     _this.state = {
       width: "0%"
     };
-    _this.toggleExpand = _this.toggleExpand.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -120,7 +120,9 @@ function (_React$Component2) {
         id: "consoleIcon"
       }))), React.createElement("div", {
         className: "consoleOutput"
-      }, "Filler"), React.createElement("div", {
+      }, this.props['buffer'].split('\n').map(function (serialIn) {
+        return React.createElement(React.Fragment, null, " ", serialIn, " ", React.createElement("br", null), " ");
+      })), React.createElement("div", {
         className: "consoleForm"
       }, React.createElement("form", {
         className: "form-inline"
@@ -193,7 +195,9 @@ function (_React$Component4) {
     _this3.state = {
       deviceConnect: false,
       portName: "",
-      port: null
+      port: null,
+      step: 0.0,
+      buffer: ""
     };
     return _this3;
   }
@@ -201,12 +205,19 @@ function (_React$Component4) {
   _createClass(App, [{
     key: "connectPort",
     value: function connectPort(foundPortName) {
+      var _this4 = this;
+
       var openPort = new SerialPort(foundPortName, {
         baudRate: 9600
       });
       openPort.on('data', function (chunk) {
-        var str = String.fromCharCode.apply(String, _toConsumableArray(chunk));
-        console.log(str);
+        var chunkStr = String.fromCharCode.apply(String, _toConsumableArray(chunk));
+        var before = _this4.state['buffer'];
+        before += chunkStr;
+
+        _this4.setState({
+          buffer: before
+        });
       });
       this.setState({
         deviceConnect: true,
@@ -217,7 +228,7 @@ function (_React$Component4) {
   }, {
     key: "findAndConnect",
     value: function findAndConnect() {
-      var _this4 = this;
+      var _this5 = this;
 
       var pr = new Promise(function (resolve, reject) {
         SerialPort.list().then(function (ports) {
@@ -225,7 +236,7 @@ function (_React$Component4) {
             var pm = port['manufacturer'];
 
             if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
-              _this4.connectPort(port.comName.toString());
+              _this5.connectPort(port.comName.toString());
 
               resolve();
             }
@@ -235,13 +246,41 @@ function (_React$Component4) {
           return console.err(err);
         });
       });
+      pr.then(function (resolve) {
+        _this5.setState({
+          step: 1.0
+        });
+      }, function (err) {
+        _this5.setState({
+          step: 1.1
+        });
+      });
     }
   }, {
     key: "render",
     value: function render() {
-      return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, null), React.createElement(Starter, {
-        findAndConnect: this.findAndConnect
-      }));
+      var instructions;
+
+      if (this.state['step'] == 0.0) {
+        // Starting Instructions
+        instructions = React.createElement(Starter, {
+          findAndConnect: this.findAndConnect
+        });
+      }
+
+      if (this.state['step'] == 1.0) {
+        // Device Found
+        instructions = React.createElement("h1", null, " found ");
+      }
+
+      if (this.state['step'] == 1.1) {
+        // Device not found
+        instructions = React.createElement("h1", null, " not found ");
+      }
+
+      return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, {
+        buffer: this.state['buffer']
+      }), instructions);
     }
   }]);
 
