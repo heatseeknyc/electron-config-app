@@ -77,15 +77,41 @@ class Starter extends React.Component {
 	}
 	render() {
 		return(
+			<div className="instructions">
 			<form>
 				<label htmlFor="plugCheck">
-				You should've received a Heat Seek Temperature Sensor and a USB cable. Plug in the end of the cable that looks like a phone charger to the side of the sensor. Plug in the other end to your computer. Open the top of the plastic case and press the small reset button on the top.
+				You should've received a Heat Seek Temperature Sensor and a USB cable.
 				</label>
 				<button className="btn btn-primary" onClick={this.handleConnect}>I did it!</button>
 			</form>
+			</div>
 		)
 	}
 }
+
+class Tester extends React.Component {
+	constructor(props) {
+		super(props);
+		this.handleTest = this.handleTest.bind(this);
+	}
+	handleTest(e) {
+		e.preventDefault();
+		this.props.testConnection(); //TODO/
+	}
+	render() {
+		return(
+			<div className="instructions">
+			<form>
+				<label htmlFor="plugCheck">
+				We will now test your connection with the sensor.
+				</label>
+				<button className="btn btn-primary" onClick={this.handleTest}>Continue</button>
+			</form>
+			</div>
+		)
+	}
+}
+
 
 class App extends React.Component {
 	constructor(props) {
@@ -93,6 +119,7 @@ class App extends React.Component {
 		this.connectPort = this.connectPort.bind(this);
 		this.findAndConnect = this.findAndConnect.bind(this);
 		this.writePort = this.writePort.bind(this);
+		this.testConnection = this.testConnection.bind(this);
 
 		this.state = {
 			deviceConnect: false,
@@ -153,19 +180,54 @@ class App extends React.Component {
 			this.state["port"].write(msg);
 		}
 	}
+	testConnection() {
+		// Test if we can currently enter the menu
+		var pr = new Promise((resolve, reject) => {
+			var i = 0;
+			var msgList = this.state['buffer'].split('\n');
+			var bufLength = msgList.length;
+			console.log(bufLength)
+			while(i < 5 && i < bufLength){
+				if(msgList[i].includes("'C'")){
+					resolve();
+				}
+				i++;
+			}
+			reject("No menu prompt found");
+		});
+
+		pr.then(
+			resolve => {
+				this.setState({ step:2.0 });
+			},
+			err => {
+				this.setState({ step:2.1 });
+			}
+		)
+	}
 	render() {
 		var instructions
-		if(this.state['step'] == 0.0) {
-			// Starting Instructions
-			instructions = <Starter findAndConnect={this.findAndConnect} />
-		}
-		if(this.state['step'] == 1.0) {
-			// Device Found
-			instructions = <h1> found </h1>
-		}
-		if(this.state['step'] == 1.1) {
-			// Device not found
-			instructions = <h1> not found </h1>
+		switch(this.state['step']) {
+			case 0.0:
+				// Starting Instructions
+				instructions = <Starter findAndConnect={this.findAndConnect} />;
+				break;
+			case 1.0:
+				// Device Found
+				instructions = <Tester testConnection={this.testConnection} />;
+				break;
+			case 1.1:
+				// Device not found
+				instructions = <h1> not found </h1>;
+				break;
+			case 2.0:
+				instructions = <h1> Test Success </h1>;
+				break;
+			case 2.1:
+				instructions = <h1> Test Failure </h1>;
+				break;
+			default:
+				instructions = <h1> Unexpected step {this.state['step']} </h1>;
 		}
 		return(
 			<div>

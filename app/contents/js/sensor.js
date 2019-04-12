@@ -185,56 +185,97 @@ function (_React$Component3) {
   }, {
     key: "render",
     value: function render() {
-      return React.createElement("form", null, React.createElement("label", {
+      return React.createElement("div", {
+        className: "instructions"
+      }, React.createElement("form", null, React.createElement("label", {
         htmlFor: "plugCheck"
-      }, "You should've received a Heat Seek Temperature Sensor and a USB cable. Plug in the end of the cable that looks like a phone charger to the side of the sensor. Plug in the other end to your computer. Open the top of the plastic case and press the small reset button on the top."), React.createElement("button", {
+      }, "You should've received a Heat Seek Temperature Sensor and a USB cable."), React.createElement("button", {
         className: "btn btn-primary",
         onClick: this.handleConnect
-      }, "I did it!"));
+      }, "I did it!")));
     }
   }]);
 
   return Starter;
 }(React.Component);
 
-var App =
+var Tester =
 /*#__PURE__*/
 function (_React$Component4) {
-  _inherits(App, _React$Component4);
+  _inherits(Tester, _React$Component4);
+
+  function Tester(props) {
+    var _this3;
+
+    _classCallCheck(this, Tester);
+
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(Tester).call(this, props));
+    _this3.handleTest = _this3.handleTest.bind(_assertThisInitialized(_this3));
+    return _this3;
+  }
+
+  _createClass(Tester, [{
+    key: "handleTest",
+    value: function handleTest(e) {
+      e.preventDefault();
+      this.props.testConnection(); //TODO/
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return React.createElement("div", {
+        className: "instructions"
+      }, React.createElement("form", null, React.createElement("label", {
+        htmlFor: "plugCheck"
+      }, "We will now test your connection with the sensor."), React.createElement("button", {
+        className: "btn btn-primary",
+        onClick: this.handleTest
+      }, "Continue")));
+    }
+  }]);
+
+  return Tester;
+}(React.Component);
+
+var App =
+/*#__PURE__*/
+function (_React$Component5) {
+  _inherits(App, _React$Component5);
 
   function App(props) {
-    var _this3;
+    var _this4;
 
     _classCallCheck(this, App);
 
-    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this3.connectPort = _this3.connectPort.bind(_assertThisInitialized(_this3));
-    _this3.findAndConnect = _this3.findAndConnect.bind(_assertThisInitialized(_this3));
-    _this3.writePort = _this3.writePort.bind(_assertThisInitialized(_this3));
-    _this3.state = {
+    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
+    _this4.connectPort = _this4.connectPort.bind(_assertThisInitialized(_this4));
+    _this4.findAndConnect = _this4.findAndConnect.bind(_assertThisInitialized(_this4));
+    _this4.writePort = _this4.writePort.bind(_assertThisInitialized(_this4));
+    _this4.testConnection = _this4.testConnection.bind(_assertThisInitialized(_this4));
+    _this4.state = {
       deviceConnect: false,
       portName: "",
       port: null,
       step: 0.0,
       buffer: ""
     };
-    return _this3;
+    return _this4;
   }
 
   _createClass(App, [{
     key: "connectPort",
     value: function connectPort(foundPortName) {
-      var _this4 = this;
+      var _this5 = this;
 
       var openPort = new SerialPort(foundPortName, {
         baudRate: 9600
       });
       openPort.on('data', function (chunk) {
         var chunkStr = String.fromCharCode.apply(String, _toConsumableArray(chunk));
-        var before = _this4.state['buffer'];
+        var before = _this5.state['buffer'];
         before += chunkStr;
 
-        _this4.setState({
+        _this5.setState({
           buffer: before
         });
       });
@@ -247,7 +288,7 @@ function (_React$Component4) {
   }, {
     key: "findAndConnect",
     value: function findAndConnect() {
-      var _this5 = this;
+      var _this6 = this;
 
       var pr = new Promise(function (resolve, reject) {
         SerialPort.list().then(function (ports) {
@@ -255,7 +296,7 @@ function (_React$Component4) {
             var pm = port['manufacturer'];
 
             if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
-              _this5.connectPort(port.comName.toString());
+              _this6.connectPort(port.comName.toString());
 
               resolve();
             }
@@ -266,11 +307,11 @@ function (_React$Component4) {
         });
       });
       pr.then(function (resolve) {
-        _this5.setState({
+        _this6.setState({
           step: 1.0
         });
       }, function (err) {
-        _this5.setState({
+        _this6.setState({
           step: 1.1
         });
       });
@@ -279,7 +320,7 @@ function (_React$Component4) {
     key: "writePort",
     value: function writePort(msg) {
       var before = this.state['buffer'];
-      before += "> " + msg;
+      before += "> " + msg + "\n";
       this.setState({
         buffer: before
       });
@@ -289,25 +330,74 @@ function (_React$Component4) {
       }
     }
   }, {
+    key: "testConnection",
+    value: function testConnection() {
+      var _this7 = this;
+
+      // Test if we can currently enter the menu
+      var pr = new Promise(function (resolve, reject) {
+        var i = 0;
+
+        var msgList = _this7.state['buffer'].split('\n');
+
+        var bufLength = msgList.length;
+        console.log(bufLength);
+
+        while (i < 5 && i < bufLength) {
+          if (msgList[i].includes("'C'")) {
+            resolve();
+          }
+
+          i++;
+        }
+
+        reject("No menu prompt found");
+      });
+      pr.then(function (resolve) {
+        _this7.setState({
+          step: 2.0
+        });
+      }, function (err) {
+        _this7.setState({
+          step: 2.1
+        });
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
       var instructions;
 
-      if (this.state['step'] == 0.0) {
-        // Starting Instructions
-        instructions = React.createElement(Starter, {
-          findAndConnect: this.findAndConnect
-        });
-      }
+      switch (this.state['step']) {
+        case 0.0:
+          // Starting Instructions
+          instructions = React.createElement(Starter, {
+            findAndConnect: this.findAndConnect
+          });
+          break;
 
-      if (this.state['step'] == 1.0) {
-        // Device Found
-        instructions = React.createElement("h1", null, " found ");
-      }
+        case 1.0:
+          // Device Found
+          instructions = React.createElement(Tester, {
+            testConnection: this.testConnection
+          });
+          break;
 
-      if (this.state['step'] == 1.1) {
-        // Device not found
-        instructions = React.createElement("h1", null, " not found ");
+        case 1.1:
+          // Device not found
+          instructions = React.createElement("h1", null, " not found ");
+          break;
+
+        case 2.0:
+          instructions = React.createElement("h1", null, " Test Success ");
+          break;
+
+        case 2.1:
+          instructions = React.createElement("h1", null, " Test Failure ");
+          break;
+
+        default:
+          instructions = React.createElement("h1", null, " Unexpected step ", this.state['step'], " ");
       }
 
       return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, {
