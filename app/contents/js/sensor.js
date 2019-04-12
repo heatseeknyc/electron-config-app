@@ -274,45 +274,159 @@ function (_React$Component4) {
   return Tester;
 }(React.Component);
 
-var App =
+var SetupWifi =
 /*#__PURE__*/
 function (_React$Component5) {
-  _inherits(App, _React$Component5);
+  _inherits(SetupWifi, _React$Component5);
+
+  function SetupWifi(props) {
+    var _this5;
+
+    _classCallCheck(this, SetupWifi);
+
+    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(SetupWifi).call(this, props));
+    _this5.handleSSIDChange = _this5.handleSSIDChange.bind(_assertThisInitialized(_this5));
+    _this5.handlePwdChange = _this5.handlePwdChange.bind(_assertThisInitialized(_this5));
+    _this5.handleRadioChange = _this5.handleRadioChange.bind(_assertThisInitialized(_this5));
+    _this5.handleClick = _this5.handleClick.bind(_assertThisInitialized(_this5));
+    _this5.state = {
+      ssid: '',
+      pwd: '',
+      selectedOption: ''
+    };
+    return _this5;
+  }
+
+  _createClass(SetupWifi, [{
+    key: "handleSSIDChange",
+    value: function handleSSIDChange(e) {
+      this.setState({
+        ssid: e.target.value
+      });
+    }
+  }, {
+    key: "handlePwdChange",
+    value: function handlePwdChange(e) {
+      this.setState({
+        pwd: e.target.value
+      });
+    }
+  }, {
+    key: "handleRadioChange",
+    value: function handleRadioChange(e) {
+      this.setState({
+        selectedOption: e.target.value
+      });
+    }
+  }, {
+    key: "handleClick",
+    value: function handleClick(e) {
+      e.preventDefault();
+      this.props.setupWifi(this.state);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return React.createElement("form", null, React.createElement("div", {
+        className: "form-group"
+      }, React.createElement("label", {
+        htmlFor: "wifiSSID"
+      }, "Let's set up your wifi. Enter the exact name of your wifi network."), React.createElement("input", {
+        type: "text",
+        className: "form-control ",
+        id: "wifiSSID",
+        onChange: this.handleSSIDChange,
+        value: this.state['ssid'],
+        required: true
+      })), React.createElement("div", {
+        className: "form-group"
+      }, React.createElement("label", {
+        htmlFor: "wifiPass"
+      }, "Enter your wifi password."), React.createElement("input", {
+        type: "password",
+        className: "form-control",
+        id: "wifiPass",
+        onChange: this.handlePwdChange,
+        value: this.state['pwd'],
+        required: true
+      })), React.createElement("div", {
+        "class": "form-group"
+      }, React.createElement("label", null, "Are you Human?"), React.createElement("div", {
+        "class": "form-check"
+      }, React.createElement("input", {
+        className: "form-check-input",
+        type: "radio",
+        id: "live",
+        value: "live",
+        name: "liveOrTest",
+        checked: this.state.selectedOption == 'live',
+        onChange: this.handleRadioChange
+      }), React.createElement("label", {
+        className: "form-check-label",
+        htmlFor: "live"
+      }, "Yes!")), React.createElement("div", {
+        "class": "form-check"
+      }, React.createElement("input", {
+        className: "form-check-input",
+        type: "radio",
+        id: "test",
+        value: "test",
+        name: "liveOrTest",
+        checked: this.state.selectedOption == 'test',
+        onChange: this.handleRadioChange
+      }), React.createElement("label", {
+        className: "form-check-label",
+        htmlFor: "test"
+      }, "No."))), React.createElement("button", {
+        type: "submit",
+        className: "btn btn-primary",
+        onClick: this.handleClick
+      }, "Connect!"));
+    }
+  }]);
+
+  return SetupWifi;
+}(React.Component);
+
+var App =
+/*#__PURE__*/
+function (_React$Component6) {
+  _inherits(App, _React$Component6);
 
   function App(props) {
-    var _this5;
+    var _this6;
 
     _classCallCheck(this, App);
 
-    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this5.connectPort = _this5.connectPort.bind(_assertThisInitialized(_this5));
-    _this5.findAndConnect = _this5.findAndConnect.bind(_assertThisInitialized(_this5));
-    _this5.writePort = _this5.writePort.bind(_assertThisInitialized(_this5));
-    _this5.testConnection = _this5.testConnection.bind(_assertThisInitialized(_this5));
-    _this5.state = {
+    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
+    _this6.connectPort = _this6.connectPort.bind(_assertThisInitialized(_this6));
+    _this6.findAndConnect = _this6.findAndConnect.bind(_assertThisInitialized(_this6));
+    _this6.writePort = _this6.writePort.bind(_assertThisInitialized(_this6));
+    _this6.testConnection = _this6.testConnection.bind(_assertThisInitialized(_this6));
+    _this6.state = {
       deviceConnect: false,
       portName: "",
       port: null,
       step: 0.0,
       buffer: ""
     };
-    return _this5;
+    return _this6;
   }
 
   _createClass(App, [{
     key: "connectPort",
     value: function connectPort(foundPortName) {
-      var _this6 = this;
+      var _this7 = this;
 
       var openPort = new SerialPort(foundPortName, {
         baudRate: 9600
       });
       openPort.on('data', function (chunk) {
         var chunkStr = String.fromCharCode.apply(String, _toConsumableArray(chunk));
-        var before = _this6.state['buffer'];
+        var before = _this7.state['buffer'];
         before += chunkStr;
 
-        _this6.setState({
+        _this7.setState({
           buffer: before
         });
       });
@@ -325,7 +439,7 @@ function (_React$Component5) {
   }, {
     key: "findAndConnect",
     value: function findAndConnect() {
-      var _this7 = this;
+      var _this8 = this;
 
       var pr = new Promise(function (resolve, reject) {
         SerialPort.list().then(function (ports) {
@@ -334,7 +448,7 @@ function (_React$Component5) {
             var pm = port['manufacturer'];
 
             if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
-              _this7.connectPort(port.comName.toString());
+              _this8.connectPort(port.comName.toString());
 
               resolve();
             }
@@ -346,11 +460,11 @@ function (_React$Component5) {
         });
       });
       pr.then(function (resolve) {
-        _this7.setState({
+        _this8.setState({
           step: 1.0
         });
       }, function (err) {
-        _this7.setState({
+        _this8.setState({
           step: 1.1
         });
       });
@@ -358,20 +472,20 @@ function (_React$Component5) {
   }, {
     key: "writePort",
     value: function writePort(msg) {
-      var _this8 = this;
+      var _this9 = this;
 
       return new Promise(function (resolve, reject) {
-        var before = _this8.state['buffer'];
+        var before = _this9.state['buffer'];
         before += "> " + msg + "\n";
 
-        _this8.setState({
+        _this9.setState({
           buffer: before
         });
 
-        if (_this8.state['deviceConnect'] == true) {
+        if (_this9.state['deviceConnect'] == true) {
           console.log("writing " + msg); // Arduino code expects newline at the end of msg.
 
-          _this8.state['port'].write(msg + '\n');
+          _this9.state['port'].write(msg + '\n');
 
           resolve();
         } else {
@@ -382,13 +496,13 @@ function (_React$Component5) {
   }, {
     key: "testConnection",
     value: function testConnection() {
-      var _this9 = this;
+      var _this10 = this;
 
       // Test if we can currently enter the menu
       var pr = new Promise(function (resolve, reject) {
         var i = 0;
 
-        var msgList = _this9.state['buffer'].split('\n');
+        var msgList = _this10.state['buffer'].split('\n');
 
         var bufLength = msgList.length;
         console.log(bufLength);
@@ -406,20 +520,25 @@ function (_React$Component5) {
       });
       pr.then(function (resolve) {
         // Enter menu and enter wifi setup
-        _this9.writePort("C").then(function (resolve) {
+        _this10.writePort("C").then(function (resolve) {
           setTimeout(function () {
-            _this9.writePort("w");
+            _this10.writePort("w");
           }, 2000);
         });
 
-        _this9.setState({
+        _this10.setState({
           step: 2.0
         });
       }, function (err) {
-        _this9.setState({
+        _this10.setState({
           step: 2.1
         });
       });
+    }
+  }, {
+    key: "setupWifi",
+    value: function setupWifi(wifiState) {
+      console.log(wifiState);
     }
   }, {
     key: "render",
@@ -447,7 +566,9 @@ function (_React$Component5) {
           break;
 
         case 2.0:
-          instructions = React.createElement("h1", null, "  ");
+          instructions = React.createElement(SetupWifi, {
+            setupWifi: this.setupWifi
+          });
           break;
 
         case 2.1:

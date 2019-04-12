@@ -86,7 +86,7 @@ class Starter extends React.Component {
 				<button className="btn btn-primary" onClick={this.handleConnect}>I did it!</button>
 			</form>
 			</div>
-		)
+		);
 	}
 }
 
@@ -133,6 +133,68 @@ class Tester extends React.Component {
 	}
 }
 
+class SetupWifi extends React.Component {
+	constructor(props) {
+		super(props);
+		this.handleSSIDChange = this.handleSSIDChange.bind(this);
+		this.handlePwdChange = this.handlePwdChange.bind(this);
+		this.handleRadioChange = this.handleRadioChange.bind(this);
+		this.handleClick = this.handleClick.bind(this);
+
+		this.state = {ssid:'', pwd:'', selectedOption:''};
+	}
+	handleSSIDChange(e) {
+		this.setState({ssid: e.target.value});
+	}
+	handlePwdChange(e) {
+		this.setState({pwd: e.target.value});
+	}
+	handleRadioChange(e) {
+		this.setState({selectedOption: e.target.value});
+	}
+	handleClick(e) {
+		e.preventDefault();
+		this.props.setupWifi(this.state);
+	}
+	render() {
+		return (
+			<form>
+				<div className="form-group">
+					<label htmlFor="wifiSSID">
+					Let's set up your wifi. Enter the exact name of your wifi network.
+					</label>
+					<input type="text" className="form-control " id="wifiSSID" onChange={this.handleSSIDChange} value={this.state['ssid']} required />
+				</div>
+
+				<div className="form-group">
+					<label htmlFor="wifiPass">
+					Enter your wifi password.
+					</label>
+					<input type="password" className="form-control" id="wifiPass" onChange={this.handlePwdChange} value={this.state['pwd']} required />
+				</div>
+
+				<div class="form-group">
+					<label>
+					Are you Human?
+					</label>
+					<div class="form-check">
+						<input className="form-check-input" type="radio" id="live" value="live" name="liveOrTest" checked={this.state.selectedOption == 'live'} onChange={this.handleRadioChange} />
+						<label className="form-check-label" htmlFor="live">
+							Yes!
+						</label>
+					</div>
+					<div class="form-check">
+						<input className="form-check-input" type="radio" id="test" value="test" name="liveOrTest" checked={this.state.selectedOption == 'test'} onChange={this.handleRadioChange} />
+						<label className="form-check-label" htmlFor="test">
+							No.
+						</label>
+					</div>
+				</div>
+				<button type="submit" className="btn btn-primary" onClick={this.handleClick}>Connect!</button>
+			</form>
+		);
+	}
+}
 
 class App extends React.Component {
 	constructor(props) {
@@ -242,6 +304,9 @@ class App extends React.Component {
 			}
 		)
 	}
+	setupWifi(wifiState) {
+		console.log(wifiState);
+	}
 	render() {
 		var instructions
 		switch(this.state['step']) {
@@ -258,7 +323,8 @@ class App extends React.Component {
 				instructions = <h1> Device not found. Reconnect and ctrl-R or cmd-R </h1>;
 				break;
 			case 2.0:
-				instructions = <h1>  </h1>;
+				// Setup Wifi
+				instructions = <SetupWifi setupWifi={this.setupWifi} />;
 				break;
 			case 2.1:
 				instructions = <h1> Sensor needs to be reset. </h1>;
