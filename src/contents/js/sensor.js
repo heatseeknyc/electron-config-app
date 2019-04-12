@@ -41,6 +41,7 @@ class SideConsole extends React.Component {
 	handleWrite(e) {
 		e.preventDefault();
 		this.props.writePort(this.state.msg);
+		this.setState({msg: ""});
 	}
 	render() {
 		return (
@@ -55,7 +56,7 @@ class SideConsole extends React.Component {
 				</div>
 				<div className="consoleForm">
 					<form className="form-inline">
-						<input type="text" className="form-control " id="consoleInput" placeholder="For developers only!" onChange={this.handleChange} />
+						<input type="text" className="form-control " id="consoleInput" placeholder="For developers only!" onChange={this.handleChange} value={this.state.msg}/>
 						<button type="submit" className="btn btn-secondary" onClick={this.handleWrite}>></button>
 					</form>
 				</div>

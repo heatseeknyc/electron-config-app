@@ -116,6 +116,9 @@ function (_React$Component2) {
     value: function handleWrite(e) {
       e.preventDefault();
       this.props.writePort(this.state.msg);
+      this.setState({
+        msg: ""
+      });
     }
   }, {
     key: "render",
@@ -147,7 +150,8 @@ function (_React$Component2) {
         className: "form-control ",
         id: "consoleInput",
         placeholder: "For developers only!",
-        onChange: this.handleChange
+        onChange: this.handleChange,
+        value: this.state.msg
       }), React.createElement("button", {
         type: "submit",
         className: "btn btn-secondary",
