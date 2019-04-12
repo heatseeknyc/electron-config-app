@@ -24,7 +24,9 @@ class SideConsole extends React.Component {
 	constructor(props) {
 		super(props);
 		this.toggleExpand = this.toggleExpand.bind(this);
-		this.state = {width: "0%"};
+		this.handleChange = this.handleChange.bind(this);
+		this.handleWrite = this.handleWrite.bind(this);
+		this.state = {width: "0%", msg: ""};
 	}
 	toggleExpand() {
 		if (this.state.width == "0%"){
@@ -32,6 +34,13 @@ class SideConsole extends React.Component {
 		}else{
 			this.setState({width: "0%"});
 		}
+	}
+	handleChange(e) {
+		this.setState({msg: e.target.value});
+	}
+	handleWrite(e) {
+		e.preventDefault();
+		this.props.writePort(this.state.msg);
 	}
 	render() {
 		return (
@@ -46,8 +55,8 @@ class SideConsole extends React.Component {
 				</div>
 				<div className="consoleForm">
 					<form className="form-inline">
-						<input type="text" className="form-control " id="consoleInput" placeholder="For developers only!" />
-						<button type="submit" className="btn btn-secondary">></button>
+						<input type="text" className="form-control " id="consoleInput" placeholder="For developers only!" onChange={this.handleChange} />
+						<button type="submit" className="btn btn-secondary" onClick={this.handleWrite}>></button>
 					</form>
 				</div>
 			</div>
@@ -81,8 +90,10 @@ class Starter extends React.Component {
 class App extends React.Component {
 	constructor(props) {
 		super(props);
-		this.findAndConnect = this.findAndConnect.bind(this);
 		this.connectPort = this.connectPort.bind(this);
+		this.findAndConnect = this.findAndConnect.bind(this);
+		this.writePort = this.writePort.bind(this);
+
 		this.state = {
 			deviceConnect: false,
 			portName: "",
@@ -134,6 +145,14 @@ class App extends React.Component {
 		)
 
 	}
+	writePort(msg) {
+		var before = this.state['buffer'];
+		before += ("> " + msg + "\n");
+		this.setState({buffer:before});
+		if(this.state['deviceConnect'] == true) {
+			this.state["port"].write(msg);
+		}
+	}
 	render() {
 		var instructions
 		if(this.state['step'] == 0.0) {
@@ -151,7 +170,7 @@ class App extends React.Component {
 		return(
 			<div>
 				<NavBar />
-				<SideConsole buffer={this.state['buffer']}/>
+				<SideConsole buffer={this.state['buffer']} writePort={this.writePort} />
 				{instructions}
 			</div>
 		);

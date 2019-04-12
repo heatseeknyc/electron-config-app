@@ -82,8 +82,11 @@ function (_React$Component2) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SideConsole).call(this, props));
     _this.toggleExpand = _this.toggleExpand.bind(_assertThisInitialized(_this));
+    _this.handleChange = _this.handleChange.bind(_assertThisInitialized(_this));
+    _this.handleWrite = _this.handleWrite.bind(_assertThisInitialized(_this));
     _this.state = {
-      width: "0%"
+      width: "0%",
+      msg: ""
     };
     return _this;
   }
@@ -100,6 +103,19 @@ function (_React$Component2) {
           width: "0%"
         });
       }
+    }
+  }, {
+    key: "handleChange",
+    value: function handleChange(e) {
+      this.setState({
+        msg: e.target.value
+      });
+    }
+  }, {
+    key: "handleWrite",
+    value: function handleWrite(e) {
+      e.preventDefault();
+      this.props.writePort(this.state.msg);
     }
   }, {
     key: "render",
@@ -130,10 +146,12 @@ function (_React$Component2) {
         type: "text",
         className: "form-control ",
         id: "consoleInput",
-        placeholder: "For developers only!"
+        placeholder: "For developers only!",
+        onChange: this.handleChange
       }), React.createElement("button", {
         type: "submit",
-        className: "btn btn-secondary"
+        className: "btn btn-secondary",
+        onClick: this.handleWrite
       }, ">"))));
     }
   }]);
@@ -190,8 +208,9 @@ function (_React$Component4) {
     _classCallCheck(this, App);
 
     _this3 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this3.findAndConnect = _this3.findAndConnect.bind(_assertThisInitialized(_this3));
     _this3.connectPort = _this3.connectPort.bind(_assertThisInitialized(_this3));
+    _this3.findAndConnect = _this3.findAndConnect.bind(_assertThisInitialized(_this3));
+    _this3.writePort = _this3.writePort.bind(_assertThisInitialized(_this3));
     _this3.state = {
       deviceConnect: false,
       portName: "",
@@ -257,6 +276,19 @@ function (_React$Component4) {
       });
     }
   }, {
+    key: "writePort",
+    value: function writePort(msg) {
+      var before = this.state['buffer'];
+      before += "> " + msg;
+      this.setState({
+        buffer: before
+      });
+
+      if (this.state['deviceConnect'] == true) {
+        this.state["port"].write(msg);
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       var instructions;
@@ -279,7 +311,8 @@ function (_React$Component4) {
       }
 
       return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, {
-        buffer: this.state['buffer']
+        buffer: this.state['buffer'],
+        writePort: this.writePort
       }), instructions);
     }
   }]);
