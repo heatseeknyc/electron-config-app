@@ -1,5 +1,13 @@
 'use strict';
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -136,15 +144,64 @@ var App =
 function (_React$Component3) {
   _inherits(App, _React$Component3);
 
-  function App() {
+  function App(props) {
+    var _this2;
+
     _classCallCheck(this, App);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(App).apply(this, arguments));
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
+    _this2.findAndConnect = _this2.findAndConnect.bind(_assertThisInitialized(_this2));
+    _this2.connectPort = _this2.connectPort.bind(_assertThisInitialized(_this2));
+    _this2.state = {
+      deviceConnect: false,
+      portName: "",
+      port: null
+    };
+    return _this2;
   }
 
   _createClass(App, [{
+    key: "connectPort",
+    value: function connectPort(foundPortName) {
+      var openPort = new SerialPort(foundPortName, {
+        baudRate: 9600
+      });
+      openPort.on('data', function (chunk) {
+        var str = String.fromCharCode.apply(String, _toConsumableArray(chunk));
+        console.log(str);
+      });
+      this.setState({
+        deviceConnect: true,
+        portName: foundPortName,
+        port: openPort
+      });
+    }
+  }, {
+    key: "findAndConnect",
+    value: function findAndConnect() {
+      var _this3 = this;
+
+      SerialPort.list().then(function (ports) {
+        ports.forEach(function (port) {
+          var pm = port['manufacturer'];
+
+          if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
+            console.log("Found sensor serialport.");
+
+            _this3.connectPort(port.comName.toString());
+          }
+        });
+      }, function (err) {
+        return console.err(err);
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
+      if (!this.state.deviceConnect) {
+        this.findAndConnect();
+      }
+
       return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, null));
     }
   }]);

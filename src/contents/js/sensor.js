@@ -54,7 +54,48 @@ class SideConsole extends React.Component {
 }
 
 class App extends React.Component {
+	constructor(props) {
+		super(props);
+		this.findAndConnect = this.findAndConnect.bind(this);
+		this.connectPort = this.connectPort.bind(this);
+		this.state = {
+			deviceConnect: false,
+			portName: "",
+			port: null
+		};
+	}
+	connectPort(foundPortName) {
+		const openPort = new SerialPort(foundPortName, {
+			baudRate: 9600
+		});
+		openPort.on('data', chunk => {
+			var str = String.fromCharCode(...chunk);
+			console.log(str);
+		});
+		this.setState({
+			deviceConnect: true,
+			portName: foundPortName,
+			port: openPort
+		});
+	}
+	findAndConnect() {
+		SerialPort.list().then(
+			ports => {
+				ports.forEach(port => {
+					var pm = port['manufacturer'];
+					if(typeof pm !== 'undefined' && pm.includes('Adafruit')){
+						console.log("Found sensor serialport.");
+						this.connectPort(port.comName.toString());
+					}
+				});
+			},
+			err => console.err(err)
+		)
+	}
 	render() {
+		if(!this.state.deviceConnect){
+			this.findAndConnect();
+		}
 		return(
 			<div>
 				<NavBar />
