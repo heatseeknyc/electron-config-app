@@ -1,3 +1,6 @@
+body{
+	margin:20px;
+}
 .nav-item a{
 	color: #000 !important;
 }

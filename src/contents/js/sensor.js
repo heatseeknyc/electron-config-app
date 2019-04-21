@@ -81,7 +81,7 @@ class Starter extends React.Component {
 			<div className="instructions">
 			<form>
 				<label htmlFor="plugCheck">
-				You should've received a Heat Seek Temperature Sensor and a USB cable.
+				Welcome to the Heat Seek setup portal! To get started, you will need your Heat Seek Temperature Sensor and a USB cable, which you should have received already.
 				</label>
 				<button className="btn btn-primary" onClick={this.handleConnect}>I did it!</button>
 			</form>
@@ -162,21 +162,21 @@ class SetupWifi extends React.Component {
 			<form>
 				<div className="form-group">
 					<label htmlFor="wifiSSID">
-					Let's set up your wifi. Enter the exact name of your wifi network.
+					Let's set up your Wi-Fi. Please enter the exact name of your Wi-Fi network (case sensitive).
 					</label>
 					<input type="text" className="form-control " id="wifiSSID" onChange={this.handleSSIDChange} value={this.state['ssid']} required />
 				</div>
 
 				<div className="form-group">
 					<label htmlFor="wifiPass">
-					Enter your wifi password.
+					Please enter your Wi-Fi password.
 					</label>
 					<input type="password" className="form-control" id="wifiPass" onChange={this.handlePwdChange} value={this.state['pwd']} required />
 				</div>
 
 				<div class="form-group">
 					<label>
-					Are you Human?
+					Are you human?
 					</label>
 					<div class="form-check">
 						<input className="form-check-input" type="radio" id="live" value="live" name="liveOrTest" checked={this.state.selectedOption == 'live'} onChange={this.handleRadioChange} />
@@ -342,14 +342,14 @@ class App extends React.Component {
 				break;
 			case 1.1:
 				// Device not found
-				instructions = <h1> Device not found. Reconnect and ctrl-R or cmd-R </h1>;
+				instructions = <h1> Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.</h1>;
 				break;
 			case 2.0:
 				// Setup Wifi
 				instructions = <SetupWifi setupWifi={this.setupWifi} />;
 				break;
 			case 2.1:
-				instructions = <h1> Sensor needs to be reset. </h1>;
+				instructions = <h1> Error: Sensor needs to be reset. </h1>;
 				break;
 			default:
 				instructions = <h1> Unexpected step {this.state['step']} </h1>;
