@@ -79,10 +79,20 @@ class Starter extends React.Component {
 	render() {
 		return(
 			<div className="instructions">
+			<h1> SETUP YOUR SENSOR </h1>
 			<form>
 				<label htmlFor="plugCheck">
-				Welcome to the Heat Seek setup portal! To get started, you will need your Heat Seek Temperature Sensor and a USB cable, which you should have received already.
+				Let's get started with your sensor!
+				<br />
+				You should've received the following:
+				<ul>
+					<li> A HeatSeek sensor </li>
+					<li> Charging cable and power plug </li>
+					<li> A reset pin </li>
+				</ul>
+				Connect the sensor to your computer with the provided cable. 
 				</label>
+				<br />
 				<button className="btn btn-primary" onClick={this.handleConnect}>I did it!</button>
 			</form>
 			</div>
@@ -93,40 +103,58 @@ class Starter extends React.Component {
 class Tester extends React.Component {
 	constructor(props) {
 		super(props);
-		this.handleTest = this.handleTest.bind(this);
-		this.enableButton = this.enableButton.bind(this);
-		this.state = {enabled:false, delay:5}
+		this.runTest = this.runTest.bind(this);
+		this.state = {tested:false};
 	}
-	handleTest(e) {
-		e.preventDefault();
-		this.props.testConnection(); //TODO/
+	runTest() {
+		if(!this.state['tested']){
+			this.props.testConnection();
+			this.setState({tested:true});
+		}
+		
 	}
-	enableButton() {
-		if(this.state['delay'] > 0){
-			setTimeout(() => {
-				this.setState({delay: this.state['delay'] - 1});
-			}, 1000);
-		}else{
-			this.setState({enabled:true})
+	render() {
+		this.runTest();
+		return(
+			<div className="instructions">
+			<h1> CONNECTING... </h1>
+			<form>
+				<label>
+				Please wait while we connect.
+				</label>
+				<br />
+				<div className="spinner-border text-primary" role="status">
+					<span className="sr-only"> Loading... </span>
+				</div>
+			</form>
+			</div>
+		);
+	}
+}
+
+class TestSuccess extends React.Component {
+	constructor(props) {
+		super(props);
+		this.goNext = this.goNext.bind(this);
+		this.state = {nexted:false};
+	}
+	goNext() {
+		if(!this.state['nexted']){
+			this.props.gotoWifi();
+			this.setState({nexted:true});
 		}
 	}
 	render() {
-		var button;
-		// Delay is decremented either in 5 seconds, or if incoming message appears
-		if(!this.state['enabled']){
-			this.enableButton();
-			var button = <button className="btn disabled">Wait {this.state['delay']}...</button>;
-		}else{
-			var button = <button className="btn btn-primary" onClick={this.handleTest}>Continue</button>;
-		}
+		this.goNext();
 		return(
 			<div className="instructions">
+			<h1> CONNECTED </h1>
 			<form>
-				<label htmlFor="plugCheck">
-				We will now test your connection with the sensor.
+				<label>
+				Sensor successfully connected.
 				</label>
 				<br />
-				{button}
+				<i className="fas fa-check-circle fa-2x green"></i>
 			</form>
 			</div>
 		);
@@ -141,7 +169,7 @@ class SetupWifi extends React.Component {
 		this.handleRadioChange = this.handleRadioChange.bind(this);
 		this.handleClick = this.handleClick.bind(this);
 
-		this.state = {ssid:'', pwd:'', selectedOption:''};
+		this.state = {ssid:'', pwd:'', selectedOption:'', submitted:false};
 	}
 	handleSSIDChange(e) {
 		this.setState({ssid: e.target.value});
@@ -155,14 +183,22 @@ class SetupWifi extends React.Component {
 	handleClick(e) {
 		e.preventDefault();
 		this.props.setupWifi(this.state);
+		this.setState({submitted:true});
 	}
 	render() {
+		var button;
+		if(!this.state['submitted']){
+			button = <button type="submit" className="btn btn-primary" onClick={this.handleClick}>Connect!</button>
+		} else{
+			button = <button className="btn btn-primary" disabled>Working...</button>
+		}
 		return (
 			<div className="instructions">
+			<h1> SETUP WIFI </h1>
 			<form>
 				<div className="form-group">
 					<label htmlFor="wifiSSID">
-					Let's set up your Wi-Fi. Please enter the exact name of your Wi-Fi network (case sensitive).
+					Please enter the exact name of your Wi-Fi network (case sensitive).
 					</label>
 					<input type="text" className="form-control " id="wifiSSID" onChange={this.handleSSIDChange} value={this.state['ssid']} required />
 				</div>
@@ -174,24 +210,24 @@ class SetupWifi extends React.Component {
 					<input type="password" className="form-control" id="wifiPass" onChange={this.handlePwdChange} value={this.state['pwd']} required />
 				</div>
 
-				<div class="form-group">
+				<div className="form-group">
 					<label>
 					Are you human?
 					</label>
-					<div class="form-check">
+					<div className="form-check">
 						<input className="form-check-input" type="radio" id="live" value="live" name="liveOrTest" checked={this.state.selectedOption == 'live'} onChange={this.handleRadioChange} />
 						<label className="form-check-label" htmlFor="live">
 							Yes!
 						</label>
 					</div>
-					<div class="form-check">
+					<div className="form-check">
 						<input className="form-check-input" type="radio" id="test" value="test" name="liveOrTest" checked={this.state.selectedOption == 'test'} onChange={this.handleRadioChange} />
 						<label className="form-check-label" htmlFor="test">
 							No.
 						</label>
 					</div>
 				</div>
-				<button type="submit" className="btn btn-primary" onClick={this.handleClick}>Connect!</button>
+				{button}
 			</form>
 			</div>
 		);
@@ -206,14 +242,32 @@ class App extends React.Component {
 		this.writePort = this.writePort.bind(this);
 		this.testConnection = this.testConnection.bind(this);
 		this.setupWifi = this.setupWifi.bind(this);
+		this.delayAndCheck = this.delayAndCheck.bind(this);
+		this.gotoWifi = this.gotoWifi.bind(this);
 
 		this.state = {
 			deviceConnect: false,
 			portName: "",
 			port: null,
 			step: 0.0,
-			buffer: ""
+			buffer: "",
+			errMsg: ""
 		};
+	}
+	delayAndCheck(duration, token) {
+		const delay = t => new Promise(resolve => setTimeout(resolve, t));
+		var flag = false;
+		return delay(duration).then(resolve => {
+			return new Promise((resolve, reject) => {
+				var msgList = this.state['buffer'].split('\n');
+				var bufLength = msgList.length;
+				if(msgList[bufLength-2].includes(token)){
+					resolve();
+				}else{
+					reject("Token: "+token+" not found in sensor output");
+				}
+			});
+		});
 	}
 	connectPort(foundPortName) {
 		const openPort = new SerialPort(foundPortName, {
@@ -276,61 +330,70 @@ class App extends React.Component {
 		});
 	}
 	testConnection() {
-		const delay = t => new Promise(resolve => setTimeout(resolve, t));
-		// Test if we can currently enter the menu
-		var pr = new Promise((resolve, reject) => {
-			var i = 0;
-			var msgList = this.state['buffer'].split('\n');
-			var bufLength = msgList.length;
-			console.log(bufLength)
-			while(i < 5 && i < bufLength){
-				if(msgList[i].includes("'C'")){
-					resolve();
-				}
-				i++;
-			}
-			// while is blocking, this is fine
-			reject("No menu prompt found");
-		});
-
-		pr.then(
+		this.delayAndCheck(3000, "C").then(
 			resolve => {
 				// Enter menu and enter wifi setup
-				this.writePort("C").then( resolve => {
-					return delay(2000);
-				}).then( resolve => {
-					 this.writePort("w");
-				});
-				this.setState({ step:2.0 });
+				this.writePort("C");
+				this.setState({ step:1.2 });
 			},
 			err => {
 				this.setState({ step:2.1 });
 			}
 		)
 	}
-	setupWifi(wifiState) {
-		console.log(wifiState);
+	gotoWifi() {
 		const delay = t => new Promise(resolve => setTimeout(resolve, t));
-		this.writePort(wifiState['ssid']).then( resolve => {
-			return delay(2000);
-		}).then( resolve => {
-			return this.writePort(wifiState['pwd']);
-		}).then( resolve => {
-			return delay(2000);
-		}).then( resolve => {
-			return this.writePort('r');
-		}).then( resolve => {
-			return delay(2000);
-		}).then( resolve => {
-			if(wifiState['selectedOption'] == 'live'){
-				return this.writePort('3600');
-			}else if(wifiState['selectedOption'] == 'test'){
-				return this.writePort('3700');
-			}
+		delay(3000).then( resolve => {
+			this.setState({ step: 2.0 });
 		});
 	}
+	setupWifi(wifiState) {
+		console.log(wifiState);
+		const rejPromise = reason => new Promise((resolve, reject) => reject(reason));
+		this.writePort("w")
+		.then( (resolve) => {
+			return this.delayAndCheck(3000, "Enter WiFi SSID");
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+			return this.writePort(wifiState['ssid']);
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+			return this.delayAndCheck(3000, "Enter WiFi password");
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+			return this.writePort(wifiState['pwd']);
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+			return this.delayAndCheck(3000, "[s]");
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+			return this.writePort('r');
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+			return this.delayAndCheck(3000, "Enter Reading interval in seconds");
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+			if(wifiState['selectedOption'] == 'test'){
+				return this.writePort('3700');
+			}else{
+				return this.writePort('3600');
+			}
+			}, (err) => { console.log(err); return rejPromise(err);}
+		)
+		.then( (resolve) => {
+				this.setState({ step:3.0 });
+			}, (err) => { this.setState({ step:3.1, errMsg:err})}
+		);
+	}
 	render() {
-		var instructions
+		var instructions;
 		switch(this.state['step']) {
 			case 0.0:
 				// Starting Instructions
@@ -342,14 +405,25 @@ class App extends React.Component {
 				break;
 			case 1.1:
 				// Device not found
-				instructions = <h1> Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.</h1>;
+				instructions = <p>Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.</p>
+				break;
+			case 1.2:
+				// Device found AND connected
+				instructions = <TestSuccess gotoWifi={this.gotoWifi} />;
 				break;
 			case 2.0:
 				// Setup Wifi
 				instructions = <SetupWifi setupWifi={this.setupWifi} />;
 				break;
 			case 2.1:
-				instructions = <h1> Error: Sensor needs to be reset. </h1>;
+				instructions = <p>Error: Sensor needs to be reset. </p>
+				break;
+			case 3.0:
+				// Done!
+				instructions = <h1> success! </h1>
+				break;
+			case 3.1:
+				instructions = <p>Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. <br/> {this.state['errMsg']}</p>
 				break;
 			default:
 				instructions = <h1> Unexpected step {this.state['step']} </h1>;

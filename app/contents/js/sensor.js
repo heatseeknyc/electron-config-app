@@ -191,9 +191,9 @@ function (_React$Component3) {
     value: function render() {
       return React.createElement("div", {
         className: "instructions"
-      }, React.createElement("form", null, React.createElement("label", {
+      }, React.createElement("h1", null, " SETUP YOUR SENSOR "), React.createElement("form", null, React.createElement("label", {
         htmlFor: "plugCheck"
-      }, "You should've received a Heat Seek Temperature Sensor and a USB cable."), React.createElement("button", {
+      }, "Let's get started with your sensor!", React.createElement("br", null), "You should've received the following:", React.createElement("ul", null, React.createElement("li", null, " A HeatSeek sensor "), React.createElement("li", null, " Charging cable and power plug "), React.createElement("li", null, " A reset pin ")), "Connect the sensor to your computer with the provided cable."), React.createElement("br", null), React.createElement("button", {
         className: "btn btn-primary",
         onClick: this.handleConnect
       }, "I did it!")));
@@ -214,70 +214,88 @@ function (_React$Component4) {
     _classCallCheck(this, Tester);
 
     _this3 = _possibleConstructorReturn(this, _getPrototypeOf(Tester).call(this, props));
-    _this3.handleTest = _this3.handleTest.bind(_assertThisInitialized(_this3));
-    _this3.enableButton = _this3.enableButton.bind(_assertThisInitialized(_this3));
+    _this3.runTest = _this3.runTest.bind(_assertThisInitialized(_this3));
     _this3.state = {
-      enabled: false,
-      delay: 5
+      tested: false
     };
     return _this3;
   }
 
   _createClass(Tester, [{
-    key: "handleTest",
-    value: function handleTest(e) {
-      e.preventDefault();
-      this.props.testConnection(); //TODO/
-    }
-  }, {
-    key: "enableButton",
-    value: function enableButton() {
-      var _this4 = this;
-
-      if (this.state['delay'] > 0) {
-        setTimeout(function () {
-          _this4.setState({
-            delay: _this4.state['delay'] - 1
-          });
-        }, 1000);
-      } else {
+    key: "runTest",
+    value: function runTest() {
+      if (!this.state['tested']) {
+        this.props.testConnection();
         this.setState({
-          enabled: true
+          tested: true
         });
       }
     }
   }, {
     key: "render",
     value: function render() {
-      var button; // Delay is decremented either in 5 seconds, or if incoming message appears
-
-      if (!this.state['enabled']) {
-        this.enableButton();
-        var button = React.createElement("button", {
-          className: "btn disabled"
-        }, "Wait ", this.state['delay'], "...");
-      } else {
-        var button = React.createElement("button", {
-          className: "btn btn-primary",
-          onClick: this.handleTest
-        }, "Continue");
-      }
-
+      this.runTest();
       return React.createElement("div", {
         className: "instructions"
-      }, React.createElement("form", null, React.createElement("label", {
-        htmlFor: "plugCheck"
-      }, "We will now test your connection with the sensor."), React.createElement("br", null), button));
+      }, React.createElement("h1", null, " CONNECTING... "), React.createElement("form", null, React.createElement("label", null, "Please wait while we connect."), React.createElement("br", null), React.createElement("div", {
+        className: "spinner-border text-primary",
+        role: "status"
+      }, React.createElement("span", {
+        className: "sr-only"
+      }, " Loading... "))));
     }
   }]);
 
   return Tester;
 }(React.Component);
 
-var SetupWifi =
+var TestSuccess =
 /*#__PURE__*/
 function (_React$Component5) {
-  _inherits(SetupWifi, _React$Component5);
+  _inherits(TestSuccess, _React$Component5);
+
+  function TestSuccess(props) {
+    var _this4;
+
+    _classCallCheck(this, TestSuccess);
+
+    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(TestSuccess).call(this, props));
+    _this4.goNext = _this4.goNext.bind(_assertThisInitialized(_this4));
+    _this4.state = {
+      nexted: false
+    };
+    return _this4;
+  }
+
+  _createClass(TestSuccess, [{
+    key: "goNext",
+    value: function goNext() {
+      if (!this.state['nexted']) {
+        this.props.gotoWifi();
+        this.setState({
+          nexted: true
+        });
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      this.goNext();
+      return React.createElement("div", {
+        className: "instructions"
+      }, React.createElement("h1", null, " CONNECTED "), React.createElement("form", null, React.createElement("label", null, "Sensor successfully connected."), React.createElement("br", null), React.createElement("i", {
+        className: "fas fa-check-circle fa-2x green"
+      })));
+    }
+  }]);
+
+  return TestSuccess;
+}(React.Component);
+
+var SetupWifi =
+/*#__PURE__*/
+function (_React$Component6) {
+  _inherits(SetupWifi, _React$Component6);
 
   function SetupWifi(props) {
     var _this5;
@@ -292,7 +310,8 @@ function (_React$Component5) {
     _this5.state = {
       ssid: '',
       pwd: '',
-      selectedOption: ''
+      selectedOption: '',
+      submitted: false
     };
     return _this5;
   }
@@ -323,17 +342,35 @@ function (_React$Component5) {
     value: function handleClick(e) {
       e.preventDefault();
       this.props.setupWifi(this.state);
+      this.setState({
+        submitted: true
+      });
     }
   }, {
     key: "render",
     value: function render() {
+      var button;
+
+      if (!this.state['submitted']) {
+        button = React.createElement("button", {
+          type: "submit",
+          className: "btn btn-primary",
+          onClick: this.handleClick
+        }, "Connect!");
+      } else {
+        button = React.createElement("button", {
+          className: "btn btn-primary",
+          disabled: true
+        }, "Working...");
+      }
+
       return React.createElement("div", {
         className: "instructions"
-      }, React.createElement("form", null, React.createElement("div", {
+      }, React.createElement("h1", null, " SETUP WIFI "), React.createElement("form", null, React.createElement("div", {
         className: "form-group"
       }, React.createElement("label", {
         htmlFor: "wifiSSID"
-      }, "Let's set up your wifi. Enter the exact name of your wifi network."), React.createElement("input", {
+      }, "Please enter the exact name of your Wi-Fi network (case sensitive)."), React.createElement("input", {
         type: "text",
         className: "form-control ",
         id: "wifiSSID",
@@ -344,7 +381,7 @@ function (_React$Component5) {
         className: "form-group"
       }, React.createElement("label", {
         htmlFor: "wifiPass"
-      }, "Enter your wifi password."), React.createElement("input", {
+      }, "Please enter your Wi-Fi password."), React.createElement("input", {
         type: "password",
         className: "form-control",
         id: "wifiPass",
@@ -352,9 +389,9 @@ function (_React$Component5) {
         value: this.state['pwd'],
         required: true
       })), React.createElement("div", {
-        "class": "form-group"
-      }, React.createElement("label", null, "Are you Human?"), React.createElement("div", {
-        "class": "form-check"
+        className: "form-group"
+      }, React.createElement("label", null, "Are you human?"), React.createElement("div", {
+        className: "form-check"
       }, React.createElement("input", {
         className: "form-check-input",
         type: "radio",
@@ -367,7 +404,7 @@ function (_React$Component5) {
         className: "form-check-label",
         htmlFor: "live"
       }, "Yes!")), React.createElement("div", {
-        "class": "form-check"
+        className: "form-check"
       }, React.createElement("input", {
         className: "form-check-input",
         type: "radio",
@@ -379,11 +416,7 @@ function (_React$Component5) {
       }), React.createElement("label", {
         className: "form-check-label",
         htmlFor: "test"
-      }, "No."))), React.createElement("button", {
-        type: "submit",
-        className: "btn btn-primary",
-        onClick: this.handleClick
-      }, "Connect!")));
+      }, "No."))), button));
     }
   }]);
 
@@ -392,8 +425,8 @@ function (_React$Component5) {
 
 var App =
 /*#__PURE__*/
-function (_React$Component6) {
-  _inherits(App, _React$Component6);
+function (_React$Component7) {
+  _inherits(App, _React$Component7);
 
   function App(props) {
     var _this6;
@@ -406,30 +439,59 @@ function (_React$Component6) {
     _this6.writePort = _this6.writePort.bind(_assertThisInitialized(_this6));
     _this6.testConnection = _this6.testConnection.bind(_assertThisInitialized(_this6));
     _this6.setupWifi = _this6.setupWifi.bind(_assertThisInitialized(_this6));
+    _this6.delayAndCheck = _this6.delayAndCheck.bind(_assertThisInitialized(_this6));
+    _this6.gotoWifi = _this6.gotoWifi.bind(_assertThisInitialized(_this6));
     _this6.state = {
       deviceConnect: false,
       portName: "",
       port: null,
       step: 0.0,
-      buffer: ""
+      buffer: "",
+      errMsg: ""
     };
     return _this6;
   }
 
   _createClass(App, [{
+    key: "delayAndCheck",
+    value: function delayAndCheck(duration, token) {
+      var _this7 = this;
+
+      var delay = function delay(t) {
+        return new Promise(function (resolve) {
+          return setTimeout(resolve, t);
+        });
+      };
+
+      var flag = false;
+      return delay(duration).then(function (resolve) {
+        return new Promise(function (resolve, reject) {
+          var msgList = _this7.state['buffer'].split('\n');
+
+          var bufLength = msgList.length;
+
+          if (msgList[bufLength - 2].includes(token)) {
+            resolve();
+          } else {
+            reject("Token: " + token + " not found in sensor output");
+          }
+        });
+      });
+    }
+  }, {
     key: "connectPort",
     value: function connectPort(foundPortName) {
-      var _this7 = this;
+      var _this8 = this;
 
       var openPort = new SerialPort(foundPortName, {
         baudRate: 9600
       });
       openPort.on('data', function (chunk) {
         var chunkStr = String.fromCharCode.apply(String, _toConsumableArray(chunk));
-        var before = _this7.state['buffer'];
+        var before = _this8.state['buffer'];
         before += chunkStr;
 
-        _this7.setState({
+        _this8.setState({
           buffer: before
         });
       });
@@ -442,7 +504,7 @@ function (_React$Component6) {
   }, {
     key: "findAndConnect",
     value: function findAndConnect() {
-      var _this8 = this;
+      var _this9 = this;
 
       var pr = new Promise(function (resolve, reject) {
         SerialPort.list().then(function (ports) {
@@ -451,7 +513,7 @@ function (_React$Component6) {
             var pm = port['manufacturer'];
 
             if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
-              _this8.connectPort(port.comName.toString());
+              _this9.connectPort(port.comName.toString());
 
               resolve();
             }
@@ -463,11 +525,11 @@ function (_React$Component6) {
         });
       });
       pr.then(function (resolve) {
-        _this8.setState({
+        _this9.setState({
           step: 1.0
         });
       }, function (err) {
-        _this8.setState({
+        _this9.setState({
           step: 1.1
         });
       });
@@ -475,20 +537,20 @@ function (_React$Component6) {
   }, {
     key: "writePort",
     value: function writePort(msg) {
-      var _this9 = this;
+      var _this10 = this;
 
       return new Promise(function (resolve, reject) {
-        var before = _this9.state['buffer'];
+        var before = _this10.state['buffer'];
         before += "> " + msg + "\n";
 
-        _this9.setState({
+        _this10.setState({
           buffer: before
         });
 
-        if (_this9.state['deviceConnect'] == true) {
+        if (_this10.state['deviceConnect'] == true) {
           console.log("writing " + msg); // Arduino code expects newline at the end of msg.
 
-          _this9.state['port'].write(msg + '\n');
+          _this10.state['port'].write(msg + '\n');
 
           resolve();
         } else {
@@ -499,57 +561,25 @@ function (_React$Component6) {
   }, {
     key: "testConnection",
     value: function testConnection() {
-      var _this10 = this;
+      var _this11 = this;
 
-      var delay = function delay(t) {
-        return new Promise(function (resolve) {
-          return setTimeout(resolve, t);
-        });
-      }; // Test if we can currently enter the menu
-
-
-      var pr = new Promise(function (resolve, reject) {
-        var i = 0;
-
-        var msgList = _this10.state['buffer'].split('\n');
-
-        var bufLength = msgList.length;
-        console.log(bufLength);
-
-        while (i < 5 && i < bufLength) {
-          if (msgList[i].includes("'C'")) {
-            resolve();
-          }
-
-          i++;
-        } // while is blocking, this is fine
-
-
-        reject("No menu prompt found");
-      });
-      pr.then(function (resolve) {
+      this.delayAndCheck(3000, "C").then(function (resolve) {
         // Enter menu and enter wifi setup
-        _this10.writePort("C").then(function (resolve) {
-          return delay(2000);
-        }).then(function (resolve) {
-          _this10.writePort("w");
-        });
+        _this11.writePort("C");
 
-        _this10.setState({
-          step: 2.0
+        _this11.setState({
+          step: 1.2
         });
       }, function (err) {
-        _this10.setState({
+        _this11.setState({
           step: 2.1
         });
       });
     }
   }, {
-    key: "setupWifi",
-    value: function setupWifi(wifiState) {
-      var _this11 = this;
-
-      console.log(wifiState);
+    key: "gotoWifi",
+    value: function gotoWifi() {
+      var _this12 = this;
 
       var delay = function delay(t) {
         return new Promise(function (resolve) {
@@ -557,22 +587,78 @@ function (_React$Component6) {
         });
       };
 
-      this.writePort(wifiState['ssid']).then(function (resolve) {
-        return delay(2000);
+      delay(3000).then(function (resolve) {
+        _this12.setState({
+          step: 2.0
+        });
+      });
+    }
+  }, {
+    key: "setupWifi",
+    value: function setupWifi(wifiState) {
+      var _this13 = this;
+
+      console.log(wifiState);
+
+      var rejPromise = function rejPromise(reason) {
+        return new Promise(function (resolve, reject) {
+          return reject(reason);
+        });
+      };
+
+      this.writePort("w").then(function (resolve) {
+        return _this13.delayAndCheck(3000, "Enter WiFi SSID");
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
       }).then(function (resolve) {
-        return _this11.writePort(wifiState['pwd']);
+        return _this13.writePort(wifiState['ssid']);
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
       }).then(function (resolve) {
-        return delay(2000);
+        return _this13.delayAndCheck(3000, "Enter WiFi password");
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
       }).then(function (resolve) {
-        return _this11.writePort('r');
+        return _this13.writePort(wifiState['pwd']);
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
       }).then(function (resolve) {
-        return delay(2000);
+        return _this13.delayAndCheck(3000, "[s]");
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
       }).then(function (resolve) {
-        if (wifiState['selectedOption'] == 'live') {
-          return _this11.writePort('3700');
-        } else if (wifiState['selectedOption'] == 'test') {
-          return _this11.writePort('3600');
+        return _this13.writePort('r');
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
+      }).then(function (resolve) {
+        return _this13.delayAndCheck(3000, "Enter Reading interval in seconds");
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
+      }).then(function (resolve) {
+        if (wifiState['selectedOption'] == 'test') {
+          return _this13.writePort('3700');
+        } else {
+          return _this13.writePort('3600');
         }
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
+      }).then(function (resolve) {
+        _this13.setState({
+          step: 3.0
+        });
+      }, function (err) {
+        _this13.setState({
+          step: 3.1,
+          errMsg: err
+        });
       });
     }
   }, {
@@ -597,7 +683,14 @@ function (_React$Component6) {
 
         case 1.1:
           // Device not found
-          instructions = React.createElement("h1", null, " Device not found. Reconnect and ctrl-R or cmd-R ");
+          instructions = React.createElement("p", null, "Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.");
+          break;
+
+        case 1.2:
+          // Device found AND connected
+          instructions = React.createElement(TestSuccess, {
+            gotoWifi: this.gotoWifi
+          });
           break;
 
         case 2.0:
@@ -608,7 +701,16 @@ function (_React$Component6) {
           break;
 
         case 2.1:
-          instructions = React.createElement("h1", null, " Sensor needs to be reset. ");
+          instructions = React.createElement("p", null, "Error: Sensor needs to be reset. ");
+          break;
+
+        case 3.0:
+          // Done!
+          instructions = React.createElement("h1", null, " success! ");
+          break;
+
+        case 3.1:
+          instructions = React.createElement("p", null, "Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. ", React.createElement("br", null), " ", this.state['errMsg']);
           break;
 
         default:
