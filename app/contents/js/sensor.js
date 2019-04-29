@@ -444,10 +444,33 @@ function (_React$Component7) {
   return ShowError;
 }(React.Component);
 
-var App =
+var ShowSuccess =
 /*#__PURE__*/
 function (_React$Component8) {
-  _inherits(App, _React$Component8);
+  _inherits(ShowSuccess, _React$Component8);
+
+  function ShowSuccess(props) {
+    _classCallCheck(this, ShowSuccess);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ShowSuccess).call(this, props));
+  }
+
+  _createClass(ShowSuccess, [{
+    key: "render",
+    value: function render() {
+      return React.createElement("div", {
+        className: "instructions"
+      }, React.createElement("h1", null, " SUCCESS "), React.createElement("form", null, React.createElement("label", null, "Your sensor has been successfully setup!", React.createElement("br", null), "Disconnect the sensor from the computer and plug in the cable to the charging plug.")));
+    }
+  }]);
+
+  return ShowSuccess;
+}(React.Component);
+
+var App =
+/*#__PURE__*/
+function (_React$Component9) {
+  _inherits(App, _React$Component9);
 
   function App(props) {
     var _this6;
@@ -484,7 +507,6 @@ function (_React$Component8) {
         });
       };
 
-      var flag = false;
       return delay(duration).then(function (resolve) {
         return new Promise(function (resolve, reject) {
           var msgList = _this7.state['buffer'].split('\n');
@@ -529,7 +551,6 @@ function (_React$Component8) {
 
       var pr = new Promise(function (resolve, reject) {
         SerialPort.list().then(function (ports) {
-          var portFlag;
           ports.forEach(function (port) {
             var pm = port['manufacturer'];
 
@@ -621,6 +642,12 @@ function (_React$Component8) {
 
       console.log(wifiState);
 
+      var delay = function delay(t) {
+        return new Promise(function (resolve) {
+          return setTimeout(resolve, t);
+        });
+      };
+
       var rejPromise = function rejPromise(reason) {
         return new Promise(function (resolve, reject) {
           return reject(reason);
@@ -668,6 +695,29 @@ function (_React$Component8) {
         } else {
           return _this13.writePort('3600');
         }
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
+      }).then(function (resolve) {
+        return _this13.delayAndCheck(3000, "[s]");
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
+      }).then(function (resolve) {
+        return _this13.writePort('s');
+      }, function (err) {
+        console.log(err);
+        return rejPromise(err);
+      }).then(function (resolve) {
+        return delay(7000).then(function (resolve) {
+          return new Promise(function (resolve, reject) {
+            if (_this13.state['buffer'].includes("Connected to WiFi")) {
+              resolve();
+            } else {
+              reject("token 'Connected to WiFi' not found in sensor output");
+            }
+          });
+        });
       }, function (err) {
         console.log(err);
         return rejPromise(err);
@@ -733,7 +783,7 @@ function (_React$Component8) {
 
         case 3.0:
           // Done!
-          instructions = React.createElement("h1", null, " success! ");
+          instructions = React.createElement(ShowSuccess, null);
           break;
 
         case 3.1:

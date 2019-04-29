@@ -259,6 +259,26 @@ class ShowError extends React.Component {
 	}
 }
 
+class ShowSuccess extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		return(
+			<div className="instructions">
+			<h1> SUCCESS </h1>
+			<form>
+				<label>
+				Your sensor has been successfully setup!
+				<br/>
+				Disconnect the sensor from the computer and plug in the cable to the charging plug.
+				</label>
+			</form>
+			</div>
+		);
+	}
+}
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
@@ -281,7 +301,6 @@ class App extends React.Component {
 	}
 	delayAndCheck(duration, token) {
 		const delay = t => new Promise(resolve => setTimeout(resolve, t));
-		var flag = false;
 		return delay(duration).then(resolve => {
 			return new Promise((resolve, reject) => {
 				var msgList = this.state['buffer'].split('\n');
@@ -314,7 +333,6 @@ class App extends React.Component {
 		var pr = new Promise((resolve, reject) => {
 			SerialPort.list().then(
 				ports => {
-					var portFlag
 					ports.forEach(port => {
 						var pm = port['manufacturer'];
 						if(typeof pm !== 'undefined' && pm.includes('Adafruit')){
@@ -374,47 +392,69 @@ class App extends React.Component {
 	}
 	setupWifi(wifiState) {
 		console.log(wifiState);
+		const delay = t => new Promise(resolve => setTimeout(resolve, t));
 		const rejPromise = reason => new Promise((resolve, reject) => reject(reason));
 		this.writePort("w")
-		.then( (resolve) => {
+		.then( resolve => {
 			return this.delayAndCheck(3000, "Enter WiFi SSID");
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then( resolve => {
 			return this.writePort(wifiState['ssid']);
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then( resolve => {
 			return this.delayAndCheck(3000, "Enter WiFi password");
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then( resolve => {
 			return this.writePort(wifiState['pwd']);
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then( resolve => {
 			return this.delayAndCheck(3000, "[s]");
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then( resolve => {
 			return this.writePort('r');
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then( resolve => {
 			return this.delayAndCheck(3000, "Enter Reading interval in seconds");
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then( resolve => {
 			if(wifiState['selectedOption'] == 'test'){
 				return this.writePort('3700');
 			}else{
 				return this.writePort('3600');
 			}
-			}, (err) => { console.log(err); return rejPromise(err);}
+			}, err => { console.log(err); return rejPromise(err);}
 		)
-		.then( (resolve) => {
+		.then ( resolve => {
+			return this.delayAndCheck(3000, "[s]");
+			}, err => { console.log(err); return rejPromise(err);}
+		)
+		.then ( resolve => {
+			return this.writePort('s')
+			}, err => { console.log(err); return rejPromise(err);}
+		)
+		.then( resolve => {
+			return delay(7000).then(resolve => {
+				return new Promise((resolve, reject) => {
+					if(this.state['buffer'].includes("Connected to WiFi")){
+						resolve();
+					}else{
+						reject("token 'Connected to WiFi' not found in sensor output");
+					}
+				});
+			});
+			}, err => { console.log(err); return rejPromise(err);}
+
+		)
+		.then( resolve => {
 				this.setState({ step:3.0 });
-			}, (err) => { this.setState({ step:3.1, errMsg:err})}
+			}, err => { this.setState({ step:3.1, errMsg:err})}
 		);
 	}
 	render() {
@@ -447,7 +487,7 @@ class App extends React.Component {
 				break;
 			case 3.0:
 				// Done!
-				instructions = <h1> success! </h1>
+				instructions = <ShowSuccess />;
 				break;
 			case 3.1:
 				//instructions = <p>Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. <br/> {this.state['errMsg']}</p>
