@@ -9,6 +9,7 @@ SerialPort.list().then(
 )
 
 class NavBar extends React.Component {
+	// Navigation bar component
 	render() {
 		return (
 			<nav className="navbar navbar-light bg-light">
@@ -21,6 +22,7 @@ class NavBar extends React.Component {
 };
 
 class SideConsole extends React.Component {
+	// Side console component
 	constructor(props) {
 		super(props);
 		this.toggleExpand = this.toggleExpand.bind(this);
@@ -36,9 +38,11 @@ class SideConsole extends React.Component {
 		}
 	}
 	handleChange(e) {
+		// React controlled form for cmd
 		this.setState({msg: e.target.value});
 	}
 	handleWrite(e) {
+		// button to send custom cmd to arduino
 		e.preventDefault();
 		this.props.writePort(this.state.msg);
 		this.setState({msg: ""});
@@ -66,6 +70,7 @@ class SideConsole extends React.Component {
 }
 
 class Starter extends React.Component {
+	// First welcome screen component
 	constructor(props) {
 		super(props);
 		this.handleConnect = this.handleConnect.bind(this);
@@ -73,7 +78,7 @@ class Starter extends React.Component {
 	handleConnect(e) {
 		// Prevent form submission
 		e.preventDefault();
-		// Tell parent to connect
+		// Tell App to connect to arduino
 		this.props.findAndConnect()
 	}
 	render() {
@@ -101,12 +106,14 @@ class Starter extends React.Component {
 }
 
 class Tester extends React.Component {
+	// Second connection test component
 	constructor(props) {
 		super(props);
 		this.runTest = this.runTest.bind(this);
 		this.state = {tested:false};
 	}
 	runTest() {
+		// Tell App to check if arduino can go into 'c' menu
 		if(!this.state['tested']){
 			this.props.testConnection();
 			this.setState({tested:true});
@@ -133,12 +140,14 @@ class Tester extends React.Component {
 }
 
 class TestSuccess extends React.Component {
+	// Connection test success component
 	constructor(props) {
 		super(props);
 		this.goNext = this.goNext.bind(this);
 		this.state = {nexted:false};
 	}
 	goNext() {
+		// Go to wifi setup 
 		if(!this.state['nexted']){
 			this.props.gotoWifi();
 			this.setState({nexted:true});
@@ -162,6 +171,7 @@ class TestSuccess extends React.Component {
 }
 
 class SetupWifi extends React.Component {
+	// Wifi setup component
 	constructor(props) {
 		super(props);
 		this.handleSSIDChange = this.handleSSIDChange.bind(this);
@@ -172,15 +182,19 @@ class SetupWifi extends React.Component {
 		this.state = {ssid:'', pwd:'', selectedOption:'', submitted:false};
 	}
 	handleSSIDChange(e) {
+		// React controlled field for SSID
 		this.setState({ssid: e.target.value});
 	}
 	handlePwdChange(e) {
+		// React controlled field for PWD
 		this.setState({pwd: e.target.value});
 	}
 	handleRadioChange(e) {
+		// React controlled field for 3600/3700
 		this.setState({selectedOption: e.target.value});
 	}
 	handleClick(e) {
+		// Form submission - write to arduino
 		e.preventDefault();
 		this.props.setupWifi(this.state);
 		this.setState({submitted:true});
@@ -235,6 +249,7 @@ class SetupWifi extends React.Component {
 }
 
 class ShowError extends React.Component {
+	// Error display component
 	constructor(props) {
 		super(props);
 	}
@@ -260,6 +275,7 @@ class ShowError extends React.Component {
 }
 
 class ShowSuccess extends React.Component {
+	// Final success display component
 	constructor(props) {
 		super(props);
 	}
@@ -280,6 +296,7 @@ class ShowSuccess extends React.Component {
 }
 
 class App extends React.Component {
+	// Overall app component
 	constructor(props) {
 		super(props);
 		this.connectPort = this.connectPort.bind(this);
@@ -300,11 +317,14 @@ class App extends React.Component {
 		};
 	}
 	delayAndCheck(duration, token) {
+		// Waits [duration] seconds then checks if LAST message contains [token]
 		const delay = t => new Promise(resolve => setTimeout(resolve, t));
 		return delay(duration).then(resolve => {
 			return new Promise((resolve, reject) => {
+				// Split by newline to access last line sent from arduino
 				var msgList = this.state['buffer'].split('\n');
 				var bufLength = msgList.length;
+				// bufLength-2 because the last item in the list is always None
 				if(msgList[bufLength-2].includes(token)){
 					resolve();
 				}else{
@@ -314,10 +334,13 @@ class App extends React.Component {
 		});
 	}
 	connectPort(foundPortName) {
+		// connect to a given port name
 		const openPort = new SerialPort(foundPortName, {
 			baudRate: 9600
 		});
 		openPort.on('data', chunk => {
+			// every time data is received, append it to the state so
+			// sidebar console can be updated
 			var chunkStr = String.fromCharCode(...chunk);
 			var before = this.state['buffer'];
 			before += chunkStr;
@@ -330,6 +353,8 @@ class App extends React.Component {
 		});
 	}
 	findAndConnect() {
+		// find a device on serial ports with manufacturer 'Adafruit'
+		// and connect to said serial port
 		var pr = new Promise((resolve, reject) => {
 			SerialPort.list().then(
 				ports => {
@@ -358,6 +383,7 @@ class App extends React.Component {
 
 	}
 	writePort(msg) {
+		// write a message to the currently connected port
 		return new Promise((resolve, reject) => {
 			var before = this.state['buffer'];
 			before += ("> " + msg + "\n");
@@ -373,6 +399,8 @@ class App extends React.Component {
 		});
 	}
 	testConnection() {
+		// Check if arduino is ready to enter the menu
+		// if it is, send 'C' to enter it
 		this.delayAndCheck(3000, "C").then(
 			resolve => {
 				// Enter menu and enter wifi setup
@@ -385,45 +413,58 @@ class App extends React.Component {
 		)
 	}
 	gotoWifi() {
+		// Transition after 3 seconds from connection success to wifi setup
 		const delay = t => new Promise(resolve => setTimeout(resolve, t));
 		delay(3000).then( resolve => {
 			this.setState({ step: 2.0 });
 		});
 	}
 	setupWifi(wifiState) {
+		// Program arduino with wifi information
 		console.log(wifiState);
 		const delay = t => new Promise(resolve => setTimeout(resolve, t));
 		const rejPromise = reason => new Promise((resolve, reject) => reject(reason));
-		this.writePort("w")
+
+		// Any error during this Promise chain is immediately propagated
+		// to the end to be displayed
+		this.writePort("w")		// enter wifi setup
 		.then( resolve => {
+			// wait for arduino to ask for SSID
 			return this.delayAndCheck(3000, "Enter WiFi SSID");
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// write SSID
 			return this.writePort(wifiState['ssid']);
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// wait for arduino to ask for pwd
 			return this.delayAndCheck(3000, "Enter WiFi password");
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// write pwd
 			return this.writePort(wifiState['pwd']);
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// wait for arduino to redisplay menu
 			return this.delayAndCheck(3000, "[s]");
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// enter interval setup
 			return this.writePort('r');
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// wait for arduino to ask for interval
 			return this.delayAndCheck(3000, "Enter Reading interval in seconds");
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// write appropriate interval
 			if(wifiState['selectedOption'] == 'test'){
 				return this.writePort('3700');
 			}else{
@@ -432,14 +473,17 @@ class App extends React.Component {
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then ( resolve => {
+			// wait for arduino to redisplay menu
 			return this.delayAndCheck(3000, "[s]");
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then ( resolve => {
+			// exit menu
 			return this.writePort('s')
 			}, err => { console.log(err); return rejPromise(err);}
 		)
 		.then( resolve => {
+			// wait for arduino to connect to the wifi
 			return delay(7000).then(resolve => {
 				return new Promise((resolve, reject) => {
 					if(this.state['buffer'].includes("Connected to WiFi")){
@@ -453,6 +497,7 @@ class App extends React.Component {
 
 		)
 		.then( resolve => {
+			// change state appropriately
 				this.setState({ step:3.0 });
 			}, err => { this.setState({ step:3.1, errMsg:err})}
 		);
@@ -470,7 +515,6 @@ class App extends React.Component {
 				break;
 			case 1.1:
 				// Device not found
-				//instructions = <p>Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.</p>
 				instructions = <ShowError reason={"Device port not found."} />;
 				break;
 			case 1.2:
@@ -482,7 +526,7 @@ class App extends React.Component {
 				instructions = <SetupWifi setupWifi={this.setupWifi} />;
 				break;
 			case 2.1:
-				//instructions = <p>Error: Sensor needs to be reset. </p>
+				// Error, device needs to be reset
 				instructions = <ShowError reason={"Device not ready to enter menu."} />;
 				break;
 			case 3.0:
@@ -490,11 +534,11 @@ class App extends React.Component {
 				instructions = <ShowSuccess />;
 				break;
 			case 3.1:
-				//instructions = <p>Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. <br/> {this.state['errMsg']}</p>
+				// Error during WiFi setup
 				instructions = <ShowError reason={this.state['errMsg']} />;
 				break;
 			default:
-				//instructions = <h1> Unexpected step {this.state['step']} </h1>;
+				// This should never happen but... just in case
 				instructions = <ShowError reason={"Unexpected step " + this.state['errMsg']} />;
 		}
 		return(
