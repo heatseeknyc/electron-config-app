@@ -81,7 +81,7 @@ class Starter extends React.Component {
 			<div className="instructions">
 			<h1> SETUP YOUR SENSOR </h1>
 			<form>
-				<label htmlFor="plugCheck">
+				<label>
 				Let's get started with your sensor!
 				<br />
 				You should've received the following:
@@ -234,6 +234,31 @@ class SetupWifi extends React.Component {
 	}
 }
 
+class ShowError extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		return(
+			<div className="instructions">
+			<h1> ERROR </h1>
+			<form>
+				<label>
+				We were unable to setup your sensor. Please do the following.
+				<br/>
+				<ol>
+					<li> Open the sensor and press the reset button. </li>
+					<li> Disconnect the cable and reconnect it. </li>
+					<li> Press <kbd><kbd>ctrl</kbd> + <kbd>R</kbd></kbd> or <kbd><kbd>⌘</kbd> + <kbd>R</kbd></kbd> to restart setup. </li>
+				</ol>
+				Error reason: {this.props.reason}
+				</label>
+			</form>
+			</div>
+		);
+	}
+}
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
@@ -264,7 +289,7 @@ class App extends React.Component {
 				if(msgList[bufLength-2].includes(token)){
 					resolve();
 				}else{
-					reject("Token: "+token+" not found in sensor output");
+					reject("token '"+token+"' not found in sensor output");
 				}
 			});
 		});
@@ -405,7 +430,8 @@ class App extends React.Component {
 				break;
 			case 1.1:
 				// Device not found
-				instructions = <p>Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.</p>
+				//instructions = <p>Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.</p>
+				instructions = <ShowError reason={"Device port not found."} />;
 				break;
 			case 1.2:
 				// Device found AND connected
@@ -416,17 +442,20 @@ class App extends React.Component {
 				instructions = <SetupWifi setupWifi={this.setupWifi} />;
 				break;
 			case 2.1:
-				instructions = <p>Error: Sensor needs to be reset. </p>
+				//instructions = <p>Error: Sensor needs to be reset. </p>
+				instructions = <ShowError reason={"Device not ready to enter menu."} />;
 				break;
 			case 3.0:
 				// Done!
 				instructions = <h1> success! </h1>
 				break;
 			case 3.1:
-				instructions = <p>Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. <br/> {this.state['errMsg']}</p>
+				//instructions = <p>Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. <br/> {this.state['errMsg']}</p>
+				instructions = <ShowError reason={this.state['errMsg']} />;
 				break;
 			default:
-				instructions = <h1> Unexpected step {this.state['step']} </h1>;
+				//instructions = <h1> Unexpected step {this.state['step']} </h1>;
+				instructions = <ShowError reason={"Unexpected step " + this.state['errMsg']} />;
 		}
 		return(
 			<div>

@@ -191,9 +191,7 @@ function (_React$Component3) {
     value: function render() {
       return React.createElement("div", {
         className: "instructions"
-      }, React.createElement("h1", null, " SETUP YOUR SENSOR "), React.createElement("form", null, React.createElement("label", {
-        htmlFor: "plugCheck"
-      }, "Let's get started with your sensor!", React.createElement("br", null), "You should've received the following:", React.createElement("ul", null, React.createElement("li", null, " A HeatSeek sensor "), React.createElement("li", null, " Charging cable and power plug "), React.createElement("li", null, " A reset pin ")), "Connect the sensor to your computer with the provided cable."), React.createElement("br", null), React.createElement("button", {
+      }, React.createElement("h1", null, " SETUP YOUR SENSOR "), React.createElement("form", null, React.createElement("label", null, "Let's get started with your sensor!", React.createElement("br", null), "You should've received the following:", React.createElement("ul", null, React.createElement("li", null, " A HeatSeek sensor "), React.createElement("li", null, " Charging cable and power plug "), React.createElement("li", null, " A reset pin ")), "Connect the sensor to your computer with the provided cable."), React.createElement("br", null), React.createElement("button", {
         className: "btn btn-primary",
         onClick: this.handleConnect
       }, "I did it!")));
@@ -423,10 +421,33 @@ function (_React$Component6) {
   return SetupWifi;
 }(React.Component);
 
-var App =
+var ShowError =
 /*#__PURE__*/
 function (_React$Component7) {
-  _inherits(App, _React$Component7);
+  _inherits(ShowError, _React$Component7);
+
+  function ShowError(props) {
+    _classCallCheck(this, ShowError);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ShowError).call(this, props));
+  }
+
+  _createClass(ShowError, [{
+    key: "render",
+    value: function render() {
+      return React.createElement("div", {
+        className: "instructions"
+      }, React.createElement("h1", null, " ERROR "), React.createElement("form", null, React.createElement("label", null, "We were unable to setup your sensor. Please do the following.", React.createElement("br", null), React.createElement("ol", null, React.createElement("li", null, " Open the sensor and press the reset button. "), React.createElement("li", null, " Disconnect the cable and reconnect it. "), React.createElement("li", null, " Press ", React.createElement("kbd", null, React.createElement("kbd", null, "ctrl"), " + ", React.createElement("kbd", null, "R")), " or ", React.createElement("kbd", null, React.createElement("kbd", null, "\u2318"), " + ", React.createElement("kbd", null, "R")), " to restart setup. ")), "Error reason: ", this.props.reason)));
+    }
+  }]);
+
+  return ShowError;
+}(React.Component);
+
+var App =
+/*#__PURE__*/
+function (_React$Component8) {
+  _inherits(App, _React$Component8);
 
   function App(props) {
     var _this6;
@@ -473,7 +494,7 @@ function (_React$Component7) {
           if (msgList[bufLength - 2].includes(token)) {
             resolve();
           } else {
-            reject("Token: " + token + " not found in sensor output");
+            reject("token '" + token + "' not found in sensor output");
           }
         });
       });
@@ -683,7 +704,10 @@ function (_React$Component7) {
 
         case 1.1:
           // Device not found
-          instructions = React.createElement("p", null, "Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.");
+          //instructions = <p>Error: Your device was not found. Please reconnect and then press ctrl-R or cmd-R.</p>
+          instructions = React.createElement(ShowError, {
+            reason: "Device port not found."
+          });
           break;
 
         case 1.2:
@@ -701,7 +725,10 @@ function (_React$Component7) {
           break;
 
         case 2.1:
-          instructions = React.createElement("p", null, "Error: Sensor needs to be reset. ");
+          //instructions = <p>Error: Sensor needs to be reset. </p>
+          instructions = React.createElement(ShowError, {
+            reason: "Device not ready to enter menu."
+          });
           break;
 
         case 3.0:
@@ -710,11 +737,17 @@ function (_React$Component7) {
           break;
 
         case 3.1:
-          instructions = React.createElement("p", null, "Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. ", React.createElement("br", null), " ", this.state['errMsg']);
+          //instructions = <p>Error: Lost connection with the sensor. Please reset, reconnect, and press ctrl-R or cmd-R. <br/> {this.state['errMsg']}</p>
+          instructions = React.createElement(ShowError, {
+            reason: this.state['errMsg']
+          });
           break;
 
         default:
-          instructions = React.createElement("h1", null, " Unexpected step ", this.state['step'], " ");
+          //instructions = <h1> Unexpected step {this.state['step']} </h1>;
+          instructions = React.createElement(ShowError, {
+            reason: "Unexpected step " + this.state['errMsg']
+          });
       }
 
       return React.createElement("div", null, React.createElement(NavBar, null), React.createElement(SideConsole, {
