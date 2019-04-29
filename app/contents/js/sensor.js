@@ -442,17 +442,32 @@ function (_React$Component7) {
 
   // Error display component
   function ShowError(props) {
+    var _this6;
+
     _classCallCheck(this, ShowError);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ShowError).call(this, props));
+    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(ShowError).call(this, props));
+    _this6.handleReload = _this6.handleReload.bind(_assertThisInitialized(_this6));
+    return _this6;
   }
 
   _createClass(ShowError, [{
+    key: "handleReload",
+    value: function handleReload(e) {
+      // Prevent form submission
+      e.preventDefault(); // Tell App to refresh
+
+      window.location.reload();
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
         className: "instructions"
-      }, React.createElement("h1", null, " ERROR "), React.createElement("form", null, React.createElement("label", null, "We were unable to setup your sensor. Please do the following.", React.createElement("br", null), React.createElement("ol", null, React.createElement("li", null, " Open the sensor and press the reset button. "), React.createElement("li", null, " Disconnect the cable and reconnect it. "), React.createElement("li", null, " Press ", React.createElement("kbd", null, React.createElement("kbd", null, "ctrl"), " + ", React.createElement("kbd", null, "R")), " or ", React.createElement("kbd", null, React.createElement("kbd", null, "\u2318"), " + ", React.createElement("kbd", null, "R")), " to restart setup. ")), "Error reason: ", this.props.reason)));
+      }, React.createElement("h1", null, " ERROR "), React.createElement("form", null, React.createElement("label", null, "We were unable to setup your sensor. Please do the following.", React.createElement("br", null), React.createElement("ol", null, React.createElement("li", null, " Open the sensor and press the reset button. "), React.createElement("li", null, " Disconnect the cable and reconnect it. "), React.createElement("li", null, " ", React.createElement("button", {
+        className: "btn btn-primary",
+        onClick: this.handleReload
+      }, "Try again!"), " ")), "Error reason: ", this.props.reason)));
     }
   }]);
 
@@ -490,19 +505,19 @@ function (_React$Component9) {
 
   // Overall app component
   function App(props) {
-    var _this6;
+    var _this7;
 
     _classCallCheck(this, App);
 
-    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this6.connectPort = _this6.connectPort.bind(_assertThisInitialized(_this6));
-    _this6.findAndConnect = _this6.findAndConnect.bind(_assertThisInitialized(_this6));
-    _this6.writePort = _this6.writePort.bind(_assertThisInitialized(_this6));
-    _this6.testConnection = _this6.testConnection.bind(_assertThisInitialized(_this6));
-    _this6.setupWifi = _this6.setupWifi.bind(_assertThisInitialized(_this6));
-    _this6.delayAndCheck = _this6.delayAndCheck.bind(_assertThisInitialized(_this6));
-    _this6.gotoWifi = _this6.gotoWifi.bind(_assertThisInitialized(_this6));
-    _this6.state = {
+    _this7 = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
+    _this7.connectPort = _this7.connectPort.bind(_assertThisInitialized(_this7));
+    _this7.findAndConnect = _this7.findAndConnect.bind(_assertThisInitialized(_this7));
+    _this7.writePort = _this7.writePort.bind(_assertThisInitialized(_this7));
+    _this7.testConnection = _this7.testConnection.bind(_assertThisInitialized(_this7));
+    _this7.setupWifi = _this7.setupWifi.bind(_assertThisInitialized(_this7));
+    _this7.delayAndCheck = _this7.delayAndCheck.bind(_assertThisInitialized(_this7));
+    _this7.gotoWifi = _this7.gotoWifi.bind(_assertThisInitialized(_this7));
+    _this7.state = {
       deviceConnect: false,
       portName: "",
       port: null,
@@ -510,13 +525,13 @@ function (_React$Component9) {
       buffer: "",
       errMsg: ""
     };
-    return _this6;
+    return _this7;
   }
 
   _createClass(App, [{
     key: "delayAndCheck",
     value: function delayAndCheck(duration, token) {
-      var _this7 = this;
+      var _this8 = this;
 
       // Waits [duration] seconds then checks if LAST message contains [token]
       var delay = function delay(t) {
@@ -528,7 +543,7 @@ function (_React$Component9) {
       return delay(duration).then(function (resolve) {
         return new Promise(function (resolve, reject) {
           // Split by newline to access last line sent from arduino
-          var msgList = _this7.state['buffer'].split('\n');
+          var msgList = _this8.state['buffer'].split('\n');
 
           var bufLength = msgList.length; // bufLength-2 because the last item in the list is always None
 
@@ -543,7 +558,7 @@ function (_React$Component9) {
   }, {
     key: "connectPort",
     value: function connectPort(foundPortName) {
-      var _this8 = this;
+      var _this9 = this;
 
       // connect to a given port name
       var openPort = new SerialPort(foundPortName, {
@@ -553,10 +568,10 @@ function (_React$Component9) {
         // every time data is received, append it to the state so
         // sidebar console can be updated
         var chunkStr = String.fromCharCode.apply(String, _toConsumableArray(chunk));
-        var before = _this8.state['buffer'];
+        var before = _this9.state['buffer'];
         before += chunkStr;
 
-        _this8.setState({
+        _this9.setState({
           buffer: before
         });
       });
@@ -569,7 +584,7 @@ function (_React$Component9) {
   }, {
     key: "findAndConnect",
     value: function findAndConnect() {
-      var _this9 = this;
+      var _this10 = this;
 
       // find a device on serial ports with manufacturer 'Adafruit'
       // and connect to said serial port
@@ -579,7 +594,7 @@ function (_React$Component9) {
             var pm = port['manufacturer'];
 
             if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
-              _this9.connectPort(port.comName.toString());
+              _this10.connectPort(port.comName.toString());
 
               resolve();
             }
@@ -591,11 +606,11 @@ function (_React$Component9) {
         });
       });
       pr.then(function (resolve) {
-        _this9.setState({
+        _this10.setState({
           step: 1.0
         });
       }, function (err) {
-        _this9.setState({
+        _this10.setState({
           step: 1.1
         });
       });
@@ -603,21 +618,21 @@ function (_React$Component9) {
   }, {
     key: "writePort",
     value: function writePort(msg) {
-      var _this10 = this;
+      var _this11 = this;
 
       // write a message to the currently connected port
       return new Promise(function (resolve, reject) {
-        var before = _this10.state['buffer'];
+        var before = _this11.state['buffer'];
         before += "> " + msg + "\n";
 
-        _this10.setState({
+        _this11.setState({
           buffer: before
         });
 
-        if (_this10.state['deviceConnect'] == true) {
+        if (_this11.state['deviceConnect'] == true) {
           console.log("writing " + msg); // Arduino code expects newline at the end of msg.
 
-          _this10.state['port'].write(msg + '\n');
+          _this11.state['port'].write(msg + '\n');
 
           resolve();
         } else {
@@ -628,19 +643,19 @@ function (_React$Component9) {
   }, {
     key: "testConnection",
     value: function testConnection() {
-      var _this11 = this;
+      var _this12 = this;
 
       // Check if arduino is ready to enter the menu
       // if it is, send 'C' to enter it
       this.delayAndCheck(3000, "C").then(function (resolve) {
         // Enter menu and enter wifi setup
-        _this11.writePort("C");
+        _this12.writePort("C");
 
-        _this11.setState({
+        _this12.setState({
           step: 1.2
         });
       }, function (err) {
-        _this11.setState({
+        _this12.setState({
           step: 2.1
         });
       });
@@ -648,7 +663,7 @@ function (_React$Component9) {
   }, {
     key: "gotoWifi",
     value: function gotoWifi() {
-      var _this12 = this;
+      var _this13 = this;
 
       // Transition after 3 seconds from connection success to wifi setup
       var delay = function delay(t) {
@@ -658,7 +673,7 @@ function (_React$Component9) {
       };
 
       delay(3000).then(function (resolve) {
-        _this12.setState({
+        _this13.setState({
           step: 2.0
         });
       });
@@ -666,7 +681,7 @@ function (_React$Component9) {
   }, {
     key: "setupWifi",
     value: function setupWifi(wifiState) {
-      var _this13 = this;
+      var _this14 = this;
 
       // Program arduino with wifi information
       console.log(wifiState);
@@ -688,65 +703,65 @@ function (_React$Component9) {
       this.writePort("w") // enter wifi setup
       .then(function (resolve) {
         // wait for arduino to ask for SSID
-        return _this13.delayAndCheck(3000, "Enter WiFi SSID");
+        return _this14.delayAndCheck(3000, "Enter WiFi SSID");
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // write SSID
-        return _this13.writePort(wifiState['ssid']);
+        return _this14.writePort(wifiState['ssid']);
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // wait for arduino to ask for pwd
-        return _this13.delayAndCheck(3000, "Enter WiFi password");
+        return _this14.delayAndCheck(3000, "Enter WiFi password");
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // write pwd
-        return _this13.writePort(wifiState['pwd']);
+        return _this14.writePort(wifiState['pwd']);
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // wait for arduino to redisplay menu
-        return _this13.delayAndCheck(3000, "[s]");
+        return _this14.delayAndCheck(3000, "[s]");
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // enter interval setup
-        return _this13.writePort('r');
+        return _this14.writePort('r');
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // wait for arduino to ask for interval
-        return _this13.delayAndCheck(3000, "Enter Reading interval in seconds");
+        return _this14.delayAndCheck(3000, "Enter Reading interval in seconds");
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // write appropriate interval
         if (wifiState['selectedOption'] == 'test') {
-          return _this13.writePort('3700');
+          return _this14.writePort('3700');
         } else {
-          return _this13.writePort('3600');
+          return _this14.writePort('3600');
         }
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // wait for arduino to redisplay menu
-        return _this13.delayAndCheck(3000, "[s]");
+        return _this14.delayAndCheck(3000, "[s]");
       }, function (err) {
         console.log(err);
         return rejPromise(err);
       }).then(function (resolve) {
         // exit menu
-        return _this13.writePort('s');
+        return _this14.writePort('s');
       }, function (err) {
         console.log(err);
         return rejPromise(err);
@@ -754,7 +769,7 @@ function (_React$Component9) {
         // wait for arduino to connect to the wifi
         return delay(7000).then(function (resolve) {
           return new Promise(function (resolve, reject) {
-            if (_this13.state['buffer'].includes("Connected to WiFi")) {
+            if (_this14.state['buffer'].includes("Connected to WiFi")) {
               resolve();
             } else {
               reject("token 'Connected to WiFi' not found in sensor output");
@@ -766,11 +781,11 @@ function (_React$Component9) {
         return rejPromise(err);
       }).then(function (resolve) {
         // change state appropriately
-        _this13.setState({
+        _this14.setState({
           step: 3.0
         });
       }, function (err) {
-        _this13.setState({
+        _this14.setState({
           step: 3.1,
           errMsg: err
         });

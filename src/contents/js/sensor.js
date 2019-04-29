@@ -252,6 +252,13 @@ class ShowError extends React.Component {
 	// Error display component
 	constructor(props) {
 		super(props);
+		this.handleReload = this.handleReload.bind(this);
+	}
+	handleReload(e) {
+		// Prevent form submission
+		e.preventDefault();
+		// Tell App to refresh
+		window.location.reload();
 	}
 	render() {
 		return(
@@ -264,7 +271,7 @@ class ShowError extends React.Component {
 				<ol>
 					<li> Open the sensor and press the reset button. </li>
 					<li> Disconnect the cable and reconnect it. </li>
-					<li> Press <kbd><kbd>ctrl</kbd> + <kbd>R</kbd></kbd> or <kbd><kbd>⌘</kbd> + <kbd>R</kbd></kbd> to restart setup. </li>
+					<li> <button className="btn btn-primary" onClick={this.handleReload}>Try again!</button> </li>
 				</ol>
 				Error reason: {this.props.reason}
 				</label>
