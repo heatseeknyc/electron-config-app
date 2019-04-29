@@ -1,7 +1,9 @@
-const spawn = require('child_process').spawn;
+//const spawn = require('child_process').spawn;
+const spawn = require('cross-spawn');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const css = require('gulp-css');
+const path = require('path');
 // 1. Copy the index.html as is
 gulp.task('html', () => {  
     return gulp.src('src/index.html')
@@ -22,7 +24,8 @@ gulp.task('js', () => { // 3.
 });
 // 4. Start the electron process.
 
-const cmd   = (name) => `./node_modules/.bin/${name}`;
+const cmd   = (name) => path.join(__dirname + `/node_modules/.bin/${name}`);
+//const cmd = (name) => name;
 const args  = (more) => Array.isArray(more) ? ['.'].concat(more) : ['.'];
 const exit  = () => process.exit();
 

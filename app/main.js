@@ -19,6 +19,9 @@ var BrowserWindow = electron.BrowserWindow;
 var mainWindow;
 app.on('ready', function () {
   mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true
+    },
     width: 1024,
     height: 768,
     icon: path.join(__dirname, 'contents/img/heat_seek_logo_splash-@2x.png')

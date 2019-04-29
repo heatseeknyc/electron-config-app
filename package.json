@@ -27,7 +27,7 @@
     "@babel/core": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-react": "^7.0.0",
-    "electron": "^4.1.4",
+    "electron": "^5.0.0",
     "electron-rebuild": "^1.8.4",
     "gulp": "^4.0.0",
     "gulp-babel": "^8.0.0",
@@ -37,7 +37,9 @@
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "cross-spawn": "^6.0.5",
     "jquery": "^3.4.0",
+    "node-abi": "^2.8.0",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
