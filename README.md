@@ -2,9 +2,9 @@
 Electron app for programming heatseek sensors
 
 ## Build Instructions
-`npm install`
-`./node_modules/.bin/electron-rebuild`
-`npm start`
+1. `npm install`
+2. `./node_modules/.bin/electron-rebuild`
+3. `npm start`
 
 ## Build Dependencies
 * `node 12.3.1`

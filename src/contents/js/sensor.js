@@ -367,7 +367,11 @@ class App extends React.Component {
 				ports => {
 					ports.forEach(port => {
 						var pm = port['manufacturer'];
+						var vid = port['vendorId'];
 						if(typeof pm !== 'undefined' && pm.includes('Adafruit')){
+							this.connectPort(port.comName.toString());
+							resolve();
+						}else if(typeof vid !== 'undefined' && vid.includes('239A')){
 							this.connectPort(port.comName.toString());
 							resolve();
 						}

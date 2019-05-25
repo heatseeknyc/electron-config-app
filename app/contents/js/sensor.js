@@ -592,8 +592,13 @@ function (_React$Component9) {
         SerialPort.list().then(function (ports) {
           ports.forEach(function (port) {
             var pm = port['manufacturer'];
+            var vid = port['vendorId'];
 
             if (typeof pm !== 'undefined' && pm.includes('Adafruit')) {
+              _this10.connectPort(port.comName.toString());
+
+              resolve();
+            } else if (typeof vid !== 'undefined' && vid.includes('239A')) {
               _this10.connectPort(port.comName.toString());
 
               resolve();
