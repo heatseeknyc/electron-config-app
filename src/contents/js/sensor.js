@@ -286,6 +286,12 @@ class ShowSuccess extends React.Component {
 	constructor(props) {
 		super(props);
 	}
+	handleReload(e) {
+		// Prevent form submission
+		e.preventDefault();
+		// Tell App to refresh
+		window.location.reload();
+	}
 	render() {
 		return(
 			<div className="instructions">
@@ -295,6 +301,8 @@ class ShowSuccess extends React.Component {
 				Your sensor has been successfully setup!
 				<br/>
 				Disconnect the sensor from the computer and plug in the cable to the charging plug.
+				<br/>
+				<button className="btn btn-primary" onClick={this.handleReload}>Start over!</button>
 				</label>
 			</form>
 			</div>

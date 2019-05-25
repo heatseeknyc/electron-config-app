@@ -487,11 +487,22 @@ function (_React$Component8) {
   }
 
   _createClass(ShowSuccess, [{
+    key: "handleReload",
+    value: function handleReload(e) {
+      // Prevent form submission
+      e.preventDefault(); // Tell App to refresh
+
+      window.location.reload();
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
         className: "instructions"
-      }, React.createElement("h1", null, " SUCCESS "), React.createElement("form", null, React.createElement("label", null, "Your sensor has been successfully setup!", React.createElement("br", null), "Disconnect the sensor from the computer and plug in the cable to the charging plug.")));
+      }, React.createElement("h1", null, " SUCCESS "), React.createElement("form", null, React.createElement("label", null, "Your sensor has been successfully setup!", React.createElement("br", null), "Disconnect the sensor from the computer and plug in the cable to the charging plug.", React.createElement("br", null), React.createElement("button", {
+        className: "btn btn-primary",
+        onClick: this.handleReload
+      }, "Start over!"))));
     }
   }]);
 
