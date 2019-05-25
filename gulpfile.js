@@ -2,7 +2,8 @@
 const spawn = require('cross-spawn');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
-const css = require('gulp-css');
+const postcss = require('gulp-postcss');
+const cssnano = require('cssnano')
 const path = require('path');
 // 1. Copy the index.html as is
 gulp.task('html', () => {  
@@ -11,8 +12,11 @@ gulp.task('html', () => {
 });
 // 2. Compile CSS file and move them to the app folder
 gulp.task('css', function() { // 2.
+    var plugins = [
+        cssnano
+    ];
     return gulp.src('src/contents/style/*.css')
-        .pipe(css())
+        .pipe(postcss(plugins))
         .pipe(gulp.dest('app/contents/style/'));
 });
 
