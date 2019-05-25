@@ -1,16 +1,19 @@
 {
   "name": "heatseek-electron",
-  "productName": "Heat Seek Sensor",
-  "version": "0.1.0",
-  "description": "Heat Seek sensor `grammer",
+  "productName": "Heat Seek Sensor Programmer",
+  "version": "0.2.0",
+  "description": "Heat Seek sensor programmer",
   "main": "app/main.js",
+  "build": {
+    "appId": "org.heatseek.sensorprogrammer"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "gulp start"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cseg-tech/heatseek-electron.git"
+    "url": "git+https://github.com/heatseeknyc/electron-config-app.git"
   },
   "keywords": [
     "Heat",
@@ -18,17 +21,18 @@
     "Sensor"
   ],
   "author": "CSEG Tech",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cseg-tech/heatseek-electron/issues"
+    "url": "https://github.com/heatseeknyc/electron-config-app/issues"
   },
-  "homepage": "https://github.com/cseg-tech/heatseek-electron#readme",
+  "homepage": "https://github.com/heatseeknyc/electron-config-app#readme",
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "electron": "^5.0.2",
+    "electron-builder": "^20.40.2",
     "electron-rebuild": "^1.8.5",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",

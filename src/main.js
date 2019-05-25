@@ -13,7 +13,7 @@ var mainWindow;
 
 app.on('ready', function() {
 
-        mainWindow = new BrowserWindow({webPreferences:{nodeIntegration: true}, width: 1024, height: 768, icon: path.join(__dirname, 'contents/img/heat_seek_logo_splash-@2x.png')});
+        mainWindow = new BrowserWindow({webPreferences:{nodeIntegration: true}, width: 1024, height: 768, icon: path.join(__dirname, 'contents/img/icons/48.png')});
 
         mainWindow.loadURL(url.format({pathname: path.join(__dirname, 'index.html'), protocol: 'file:', slashes: true } ));
 

@@ -2,13 +2,18 @@
 Electron app for programming heatseek sensors
 
 ## Build Instructions
-1. `npm install`
-2. `./node_modules/.bin/electron-rebuild`
-3. `npm start`
+1. `yarn`
+2. `npm start`
+
+## Packaging Instructions
+1. Follow build instructions
+2. `./node_modules/.bin/electron-builder build`
 
 ## Build Dependencies
 * `node 12.3.1`
+* `yarn 1.16.0`
 * `electron 5.0.2`
+* `electron-builder 20.40.2`
 * `serialport 7.1.5`
 * `gulp 4.0.2`
 * `gulp-babel 8.0.0`

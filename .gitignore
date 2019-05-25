@@ -1,2 +1,5 @@
 node_modules/
 Heat Seek Sensor-*/
+resources/
+dist/
+*.log
