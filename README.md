@@ -1,13 +1,10 @@
 # heatseek-electron
 Electron app for programming heatseek sensors
 
-## Build Instructions
+## Build/Packaging Instructions
 1. `yarn`
-2. `npm start`
-
-## Packaging Instructions
-1. Follow build instructions
 2. `./node_modules/.bin/electron-builder build`
+2. `npm start`
 
 ## Build Dependencies
 * `node 12.3.1`
