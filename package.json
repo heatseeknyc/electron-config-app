@@ -43,7 +43,7 @@
     "bootstrap": "^4.3.1",
     "cross-spawn": "^6.0.5",
     "cssnano": "^4.1.10",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
